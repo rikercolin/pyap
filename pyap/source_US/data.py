@@ -354,14 +354,35 @@ full_street = r"""
 # region1 is actually a "state"
 region1 = r"""
         (?P<region1>
-            (?:
-                # states abbreviations
-                AL|AK|AZ|AR|CA|CO|CT|DE|DC|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|
-                MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|
-                VA|WA|WV|WI|WY|
+            \b(?:
+                #State Abbreviations
+                [Aa]\.?(?:[Ll]|[Kk]|[Zz]|[Rr])|
+                [Cc]\.?(?:[Aa]|[Oo]|[Tt])|
+                [Dd]\.?(?:[Ee]|[Cc])|
+                [Ff]\.?[Ll]|
+                [Gg]\.?[Aa]|
+                [Hh]\.?[Ii]|
+                [Ii]\.?(?:[Dd]|[Ll]|[Nn]|[Aa])|
+                [Kk]\.?(?:[Ss]|[Yy])|
+                [Ll]\.?[Aa]|
+                [Mm]\.?(?:[Ee]|[Dd]|[Aa]|[Ii]|[Nn]|[Ss]|[Oo]|[Tt])|
+                [Nn]\.?(?:[Ee]|[Vv]|[Hh]|[Jj]|[Mm]|[Yy]|[Cc]|[Dd])|
+                [Oo]\.?(?:[Hh]|[Kk]|[Rr])|
+                [Pp]\.?[Aa]|
+                [Rr]\.?[Ii]|
+                [Ss]\.?(?:[Cc]|[Dd])|
+                [Tt]\.?(?:[Nn]|[Xx])|
+                [Uu]\.?[Tt]|
+                [Vv]\.?(?:[Tt]|[Aa])|
+                [Ww]\.?(?:[Aa]|[Vv]|[Ii]|[Yy])|
+
                 # unincorporated & commonwealth territories
-                AS|GU|MP|PR|VI
-            )
+                [Aa]\.?[Ss]|
+                [Gg]\.?[Uu]|
+                [Mm]\.?[Pp]|
+                [Pp]\.?[Rr]|
+                [Vv]\.?[Ii]
+            )\b
             |
             (?:
                 # states full
