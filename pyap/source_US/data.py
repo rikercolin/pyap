@@ -116,11 +116,11 @@ post_direction = r"""
                         )
                         |
                         (?:
-                            NW\ |NE\ |SW\ |SE\ 
+                            N\.?W\.?|N\.?E\.?|S\.?W\.?|S\.?E\.?
                         )
                         |
                         (?:
-                            N\.?\ |S\.?\ |E\.?\ |W\.?\ 
+                            N\.?|S\.?|E\.?|W\.?
                         )
                     )
                 """
@@ -313,6 +313,9 @@ occupancy = r"""
                             |
                             # Room
                             [Rr][Oo][Oo][Mm]\ |[Rr][Mm]\.?\ 
+                            |
+                            #Units
+                            [Uu][Nn][Ii][Tt]\.?\ 
                         )
                         (?:
                             [A-Za-z\#\&\-\d]{1,7}
@@ -325,7 +328,7 @@ occupancy = r"""
                 )\ ?
             )
             """
-            
+
 po_box = r"""
             (?:
                 [Pp]\.?\ ?[Oo]\.?\ [Bb][Oo][Xx]\ \d+
@@ -498,7 +501,7 @@ full_address = r"""
                 )
                 """.format(
     full_street=full_street,
-    div=r'[\ |\,|\-|\||∙•▪\\\/]{,3}',
+    div=r'[\ |\,|\-|\||∙••▪\\\/]{,3}',
     city=city,
     region1=region1,
     country=country,

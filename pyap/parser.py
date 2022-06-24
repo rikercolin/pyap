@@ -128,6 +128,8 @@ class AddressParser:
             '–': '-',
             '—': '-',
             '―': '-',
+            '​': '',
+            ' ':' '
         }
         for find, replace in six.iteritems(conversion):
             text = re.sub(find, replace, text, flags=re.UNICODE)
