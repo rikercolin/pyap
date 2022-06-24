@@ -136,7 +136,7 @@ street_type_list = [
     'Bnd', 'Bot', 'Bottm', 'Bottom', 'Boul', 'Boulevard',
     'Boulv', 'Br', 'Branch', 'Brdge', 'Brg', 'Bridge',
     'Brk', 'Brks', 'Brnch', 'Broadway', 'Brook', 'Brooks',
-    'Btm', 'Burg', 'Burgs', 'Byp', 'Bypa', 'Bypas',
+    'Btm', 'Building', 'Bld', 'Burg', 'Burgs', 'Byp', 'Bypa', 'Bypas',
     'Bypass', 'Byps', 'Byu', 'Camp', 'Canyn', 'Canyon',
     'Cape', 'Causeway', 'Causwa', 'Cen', 'Cent', 'Center',
     'Centers', 'Centr', 'Centre', 'Cir', 'Circ', 'Circl',
@@ -227,7 +227,8 @@ def street_type_list_to_regex(street_type_list):
     """Converts a list of street types into a regex"""
     street_types = '|'.join(set(street_type_list)).lower()
     for letter in string.ascii_lowercase:
-        street_types = street_types.replace(letter, '[{upper}{lower}]'.format(upper=letter.upper(), lower=letter))
+        street_types = street_types.replace(
+            letter, '[{upper}{lower}]'.format(upper=letter.upper(), lower=letter))
 
     # Use \b to check that there are word boundaries before and after the street type
     # Optionally match zero to two of " ", ",", or "." after the street name
@@ -298,7 +299,7 @@ building = r"""
                        )
 
 occupancy = r"""
-            (?P<occupancy>
+            (?:
                 (?:
                     (?:
                         (?:
@@ -307,6 +308,8 @@ occupancy = r"""
                             |
                             # Apartment
                             [Aa][Pp][Tt]\.?\ |[Aa][Pp][Aa][Rr][Tt][Mm][Ee][Nn][Tt]\ 
+                            |
+                            [Aa][Pp][Pp][Tt]\.?\ |[Aa][Pp][Aa][Rr][Tt][Mm][Ee][Nn][Tt]\ 
                             |
                             # Room
                             [Rr][Oo][Oo][Mm]\ |[Rr][Mm]\.?\ 
@@ -317,31 +320,47 @@ occupancy = r"""
                     )
                     |
                     (?:
-                        \#[0-9]{,3}[A-Za-z]{1}
+                        \#?[0-9]{,3}[A-Za-z]{1}
                     )
                 )\ ?
             )
             """
-
+            
 po_box = r"""
             (?:
                 [Pp]\.?\ ?[Oo]\.?\ [Bb][Oo][Xx]\ \d+
             )
         """
 
+dorm = r"""
+    (?P<dorm>
+        {occupancy}
+        (?:
+            \b[a-zA-Z\ ]{{1,20}}\b[Hh][Aa][Ll][Ll]\b
+        )
+    )""".format(occupancy=occupancy)
+
 full_street = r"""
     (?:
         (?P<full_street>
-            {street_number}
-            {street_name}?\,?\ ?
-            (?:[\ \,]{street_type})\,?\ ?
-            {post_direction}?\,?\ ?
-            {floor}?\,?\ ?
-            {building}?\,?\ ?
-            {occupancy}?\,?\ ?
-            {po_box}?
+            (?:
+                {dorm}?\,?\ ?
+                {street_number}
+                {street_name}?\,?\ ?
+                (?:[\ \,]{street_type})\,?\ ?
+                {post_direction}?\,?\ ?
+                {floor}?\,?\ ?
+                {building}?\,?\ ?
+                {occupancy}?\,?\ ?
+                {po_box}?
+            )
+            |
+            (?:
+                {po_box}
+            )
         )
-    )""".format(street_number=street_number,
+    )""".format(dorm=dorm,
+                street_number=street_number,
                 street_name=street_name,
                 street_type=street_type,
                 post_direction=post_direction,
@@ -471,16 +490,15 @@ country = r"""
 
 full_address = r"""
                 (?P<full_address>
-                    {full_street} {div}
-                    {city} {div}
-                    {region1} {div}
-                    (?:
-                        (?:{postal_code}?(\ ?,?{country})?)
-                    )
+                    {full_street}
+                    (?:{div} {city})
+                    (?:{div} {region1})?
+                    (?:{div} {postal_code})?
+                    (?:{div} {country})?
                 )
                 """.format(
     full_street=full_street,
-    div=r'[\ |\,|\-|\||•▪\\\/]{,3}',
+    div=r'[\ |\,|\-|\||∙•▪\\\/]{,3}',
     city=city,
     region1=region1,
     country=country,
