@@ -23,6 +23,8 @@ instead of '(one)(?i)' to match 'One' or 'oNe' because
 Python Regexps don't seem to support turning On/Off
 case modes for subcapturing groups.
 '''
+common_div = r'[\ |\,|\-|\||٠∙•••●▪\\\/]{0,3}'
+
 zero_to_nine = r"""(?:
     [Zz][Ee][Rr][Oo]\ |[Oo][Nn][Ee]\ |[Tt][Ww][Oo]\ |
     [Tt][Hh][Rr][Ee][Ee]\ |[Ff][Oo][Uu][Rr]\ |
@@ -61,6 +63,15 @@ hundred = r"""(?:
 thousand = r"""(?:
     [Tt][Hh][Oo][Uu][Ss][Aa][Nn][Dd]\ 
     )"""
+div = r"""[\ ,\-]{0,2} """
+post_number_directions = r"""
+                            (?:
+                                (?:\d[\ ,\-]{0,2}N|N\d) |
+                                (?:\d[\ ,\-]{0,2}S|S\d) |
+                                (?:\d[\ ,\-]{0,2}E|E\d) |
+                                (?:\d[\ ,\-]{0,2}W|W\d)
+                            )
+"""
 
 '''
 Regexp for matching street number.
@@ -73,8 +84,6 @@ Street number can be written 2 ways:
 '''
 street_number = r"""(?P<street_number>
                         (?:
-                            [Aa][Nn][Dd]\ 
-                            |
                             {thousand}
                             |
                             {hundred}
@@ -84,7 +93,8 @@ street_number = r"""(?P<street_number>
                             {ten_to_ninety}
                         ){from_to}
                         |
-                        (?:\d{from_to}
+                        (?:
+                            (?:\d|{post_number_directions}){from_to}
                             (?:\ ?\-?\ ?\d{from_to})?\ 
                         )
                     )
@@ -92,7 +102,8 @@ street_number = r"""(?P<street_number>
                            hundred=hundred,
                            zero_to_nine=zero_to_nine,
                            ten_to_ninety=ten_to_ninety,
-                           from_to='{1,5}')
+                           post_number_directions=post_number_directions,
+                           from_to='{1,6}')
 
 '''
 Regexp for matching street name.
@@ -114,14 +125,18 @@ post_direction = r"""
                             [Ee][Aa][Ss][Tt]\ |
                             [Ww][Ee][Ss][Tt]\ 
                         )
+                        (?:
+                            \s?[Ee][Aa][Ss][Tt]\ |
+                            \s?[Ww][Ee][Ss][Tt]\ 
+                        )?
                         |
                         (?:
                             N\.?W\.?|N\.?E\.?|S\.?W\.?|S\.?E\.?
-                        )
+                        )\b
                         |
                         (?:
                             N\.?|S\.?|E\.?|W\.?
-                        )
+                        )\b
                     )
                 """
 
@@ -169,7 +184,7 @@ street_type_list = [
     'Highwy', 'Hill', 'Hills', 'Hiway', 'Hiwy', 'Hl',
     'Hllw', 'Hls', 'Hollow', 'Hollows', 'Holw', 'Holws',
     'Hrbor', 'Ht', 'Hts', 'Hvn', 'Hway', 'Hwy',
-    'Inlet', 'Inlt', 'Is', 'Island', 'Islands', 'Isle',
+    'Inlet', 'Inlt', 'Island', 'Islands', 'Isle',
     'Isles', 'Islnd', 'Islnds', 'Iss', 'Jct', 'Jction',
     'Jctn', 'Jctns', 'Jcts', 'Junction', 'Junctions', 'Junctn',
     'Juncton', 'Key', 'Keys', 'Knl', 'Knls', 'Knol',
@@ -221,6 +236,8 @@ street_type_list = [
     'Wall', 'Way', 'Ways', 'Well', 'Wells', 'Wl',
     'Wls', 'Wy', 'Xing', 'Xrd', 'Xrds',
 ]
+
+removed_street_type_list = ['Is']
 
 
 def street_type_list_to_regex(street_type_list):
@@ -371,6 +388,7 @@ full_street = r"""
                 building=building,
                 occupancy=occupancy,
                 po_box=po_box,
+                div=common_div,
                 )
 
 # region1 is actually a "state"
@@ -494,14 +512,14 @@ country = r"""
 full_address = r"""
                 (?P<full_address>
                     {full_street}
-                    (?:{div} {city})
+                    (?:{div} {city})?
                     (?:{div} {region1})?
                     (?:{div} {postal_code})?
                     (?:{div} {country})?
                 )
                 """.format(
     full_street=full_street,
-    div=r'[\ |\,|\-|\||∙••▪\\\/]{,3}',
+    div=common_div,
     city=city,
     region1=region1,
     country=country,
