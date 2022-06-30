@@ -24,6 +24,7 @@ Python Regexps don't seem to support turning On/Off
 case modes for subcapturing groups.
 '''
 common_div = r'[\ |\,|\-|\||٠∙•••●▪\\\/]{0,3}'
+restrictive_div = r'[\.\ \,]{0,3}'
 
 zero_to_nine = r"""(?:
     [Zz][Ee][Rr][Oo]\ |[Oo][Nn][Ee]\ |[Tt][Ww][Oo]\ |
@@ -69,7 +70,8 @@ post_number_directions = r"""
                                 (?:\d[\ ,\-]{0,2}N|N\d) |
                                 (?:\d[\ ,\-]{0,2}S|S\d) |
                                 (?:\d[\ ,\-]{0,2}E|E\d) |
-                                (?:\d[\ ,\-]{0,2}W|W\d)
+                                (?:\d[\ ,\-]{0,2}W|W\d) |
+                                (?:\d[\ ,\-]{0,2}P|P\d)
                             )
 """
 
@@ -91,7 +93,18 @@ street_number = r"""(?P<street_number>
                             {zero_to_nine}
                             |
                             {ten_to_ninety}
-                        ){from_to}
+                        )
+                        (?:
+                            [Aa][Nn][Dd]\ 
+                            |
+                            {thousand}
+                            |
+                            {hundred}
+                            |
+                            {zero_to_nine}
+                            |
+                            {ten_to_ninety}
+                        ){{0,4}}\,
                         |
                         (?:
                             (?:\d|{post_number_directions}){from_to}
@@ -103,7 +116,7 @@ street_number = r"""(?P<street_number>
                            zero_to_nine=zero_to_nine,
                            ten_to_ninety=ten_to_ninety,
                            post_number_directions=post_number_directions,
-                           from_to='{1,6}')
+                           from_to='{1,5}')
 
 '''
 Regexp for matching street name.
@@ -237,7 +250,7 @@ street_type_list = [
     'Wls', 'Wy', 'Xing', 'Xrd', 'Xrds',
 ]
 
-removed_street_type_list = ['Is']
+removed_street_type_list = ['Is', 'Point', 'Center', 'Belt']
 
 
 def street_type_list_to_regex(street_type_list):
@@ -272,14 +285,21 @@ street_type = r"""
     street_types=street_type_list_to_regex(street_type_list),
 )
 
+special_streets = r"""
+        (?:
+            (?:OH-\d{2})|
+            (?:[Cc][Oo][Uu][Nn][Tt][Yy]\ [Rr][Oo][Aa][Dd]\ \d{2})
+        )
+"""
+
 floor = r"""
             (?P<floor>
                 (?:
-                \d+[A-Za-z]{0,2}\.?\ [Ff][Ll][Oo][Oo][Rr]\ 
+                \d+[A-Za-z]{0,2}\.?\ [Ff][Ll][Oo][Oo][Rr]\ ?
                 )
                 |
                 (?:
-                    [Ff][Ll][Oo][Oo][Rr]\ \d+[A-Za-z]{0,2}\ 
+                    [Ff][Ll][Oo][Oo][Rr]\ \d+[A-Za-z]{0,2}\ ?
                 )
             )
         """
@@ -294,6 +314,15 @@ building = r"""
                 \ 
                 (?:
                     (?:
+                        {thousand}
+                        |
+                        {hundred}
+                        |
+                        {zero_to_nine}
+                        |
+                        {ten_to_ninety}
+                    )
+                    (?:
                         [Aa][Nn][Dd]\ 
                         |
                         {thousand}
@@ -303,7 +332,7 @@ building = r"""
                         {zero_to_nine}
                         |
                         {ten_to_ninety}
-                    ){{1,5}}
+                    ){{0,4}}
                     |
                     \d{{0,4}}[A-Za-z]?
                 )
@@ -324,15 +353,13 @@ occupancy = r"""
                             [Ss][Uu][Ii][Tt][Ee]\ |[Ss][Tt][Ee]\.?\ 
                             |
                             # Apartment
-                            [Aa][Pp][Tt]\.?\ |[Aa][Pp][Aa][Rr][Tt][Mm][Ee][Nn][Tt]\ 
-                            |
-                            [Aa][Pp][Pp][Tt]\.?\ |[Aa][Pp][Aa][Rr][Tt][Mm][Ee][Nn][Tt]\ 
+                            [Aa][Pp][Tt]\.?\ |[Aa][Pp][Aa][Rr][Tt][Mm][Ee][Nn][Tt]\ |[Aa][Pp][Pp][Tt]\.?\
                             |
                             # Room
                             [Rr][Oo][Oo][Mm]\ |[Rr][Mm]\.?\ 
                             |
                             #Units
-                            [Uu][Nn][Ii][Tt]\.?\ 
+                            [Uu][Nn][Ii][Tt]\ 
                         )
                         (?:
                             [A-Za-z\#\&\-\d]{1,7}
@@ -348,7 +375,7 @@ occupancy = r"""
 
 po_box = r"""
             (?:
-                [Pp]\.?\ ?[Oo]\.?\ [Bb][Oo][Xx]\ \d+
+                [Pp]\.?\ ?[Oo]\.?.{,3}[Bb][Oo][Xx]\ \d+
             )
         """
 
@@ -364,19 +391,25 @@ full_street = r"""
     (?:
         (?P<full_street>
             (?:
+                {po_box}
+            )
+            |
+            (?:
                 {dorm}?\,?\ ?
                 {street_number}
-                {street_name}?\,?\ ?
-                (?:[\ \,]{street_type})\,?\ ?
+                (?:
+                    (?:{special_streets}\,?\ ?)
+                    |
+                    (?:
+                        {street_name}?\,?\ ?
+                        (?:[\ \,]{street_type})\,?\ ?
+                    )
+                )
                 {post_direction}?\,?\ ?
                 {floor}?\,?\ ?
                 {building}?\,?\ ?
                 {occupancy}?\,?\ ?
                 {po_box}?
-            )
-            |
-            (?:
-                {po_box}
             )
         )
     )""".format(dorm=dorm,
@@ -388,7 +421,8 @@ full_street = r"""
                 building=building,
                 occupancy=occupancy,
                 po_box=po_box,
-                div=common_div,
+                div=restrictive_div,
+                special_streets=special_streets
                 )
 
 # region1 is actually a "state"
@@ -512,10 +546,12 @@ country = r"""
 full_address = r"""
                 (?P<full_address>
                     {full_street}
-                    (?:{div} {city})?
-                    (?:{div} {region1})?
-                    (?:{div} {postal_code})?
-                    (?:{div} {country})?
+                    (?:
+                        (?:{div} {city})?
+                        (?:{div} {region1})?
+                        (?:{div} {postal_code})?
+                        (?:{div} {country})?
+                    )
                 )
                 """.format(
     full_street=full_street,
