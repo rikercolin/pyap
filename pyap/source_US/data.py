@@ -23,7 +23,7 @@ instead of '(one)(?i)' to match 'One' or 'oNe' because
 Python Regexps don't seem to support turning On/Off
 case modes for subcapturing groups.
 '''
-common_div = r'[\ |\,|\-|\||٠∙•••●▪\\\/]{0,3}'
+common_div = r'[\ |\,|\-|\||٠∙•••●▪\\\/;]{0,3}'
 restrictive_div = r'[\.\ \,]{0,3}'
 
 zero_to_nine = r"""(?:
@@ -71,7 +71,10 @@ post_number_directions = r"""
                                 (?:\d[\ ,\-]{0,2}S|S\d) |
                                 (?:\d[\ ,\-]{0,2}E|E\d) |
                                 (?:\d[\ ,\-]{0,2}W|W\d) |
-                                (?:\d[\ ,\-]{0,2}P|P\d)
+
+                                (?:\d[\ ,\-]{0,2}P|P\d) |
+                                (?:\d[\ ,\-]{0,2}D|D\d) |
+                                (?:\d[\ ,\-]{0,2}A|A\d)
                             )
 """
 
@@ -84,6 +87,44 @@ Street number can be written 2 ways:
    b) - "85-1190"
    c) - "85 1190"
 '''
+street_number_follow_exclusions = r"""
+                                \b(?:
+                                    [Yy]ears?|
+                                    [Mm]onths?|
+                                    [Hh]ours?|
+                                    [Aa]\.?[Mm]|
+                                    [Pp]\.?[Mm]|
+
+                                    [Aa]nd|
+                                    [Aa]t|
+                                    [Bb]y|
+                                    [Tt]o|
+                                    [Ff]or|
+                                    [Ff]rom|
+                                    [Oo]r|
+                                    [Oo]f|
+                                    [Tt]he|
+                                    [Ii]f|
+                                    [Ii]n|
+                                    [I]|
+                                    [Ii]s|
+                                    [Mm]e|
+                                    [Yy]ou|
+                                    [Ll]ike|
+                                    [Ww]hen|
+                                    [Tt]his|
+
+                                    (?:.{0,10}(:[Ss]q.?(?:uare)?\ )?[Ff](?:ee)?t\.?)|
+                                    (?:[Pp]er(?:\,?\ ?cent)?\b)|
+                                    (?:[12][90]\d{2}\W{0,6}\d{1,2}(?:[Ss]t|[Nn]d|[Rr]d|[Tt]h))|
+
+                                    [Bb]asis|
+                                    [Tt]ransactions|
+                                    [Ee]xt|
+                                    [Ff]ax
+                                )\b
+                            """
+
 street_number = r"""(?P<street_number>
                         (?:
                             {thousand}
@@ -109,6 +150,10 @@ street_number = r"""(?P<street_number>
                         (?:
                             (?:\d|{post_number_directions}){from_to}
                             (?:\ ?\-?\ ?\d{from_to})?\ 
+                            (?!
+                                \D{{0,4}}
+                                {exclusions}
+                            )
                         )
                     )
                 """.format(thousand=thousand,
@@ -116,6 +161,7 @@ street_number = r"""(?P<street_number>
                            zero_to_nine=zero_to_nine,
                            ten_to_ninety=ten_to_ninety,
                            post_number_directions=post_number_directions,
+                           exclusions=street_number_follow_exclusions,
                            from_to='{1,5}')
 
 '''
@@ -124,7 +170,7 @@ In example below:
 "Hoover Boulevard": "Hoover" is a street name
 '''
 street_name = r"""(?P<street_name>
-                  [a-zA-Z0-9\ \.]{3,31}  # Seems like the longest US street is
+                  [a-zA-Z0-9\ \.\-]{3,31}  # Seems like the longest US street is
                                          # 'Northeast Kentucky Industrial Parkway'
                                          # https://atkinsbookshelf.wordpress.com/tag/longest-street-name-in-us/
                  )
@@ -215,7 +261,7 @@ street_type_list = [
     'Opas', 'Orch', 'Orchard', 'Orchrd', 'Oval', 'Overpass',
     'Ovl', 'Park', 'Parks', 'Parkway', 'Parkways', 'Parkwy',
     'Pass', 'Passage', 'Path', 'Paths', 'Pike', 'Pikes',
-    'Pine', 'Pines', 'Pkway', 'Pkwy', 'Pkwys', 'Pky',
+    'Pine', 'Pines','Parkway', 'Pkway', 'Pkwy', 'Pkwys', 'Pky',
     'Pl', 'Place', 'Plain', 'Plains', 'Plaza', 'Pln',
     'Plns', 'Plz', 'Plza', 'Pne', 'Pnes', 'Point',
     'Points', 'Port', 'Ports', 'Pr', 'Prairie', 'Prk',
@@ -250,7 +296,7 @@ street_type_list = [
     'Wls', 'Wy', 'Xing', 'Xrd', 'Xrds',
 ]
 
-removed_street_type_list = ['Is', 'Point', 'Center', 'Belt']
+removed_street_type_list = ['Is']
 
 
 def street_type_list_to_regex(street_type_list):
@@ -288,7 +334,10 @@ street_type = r"""
 special_streets = r"""
         (?:
             (?:OH-\d{2})|
-            (?:[Cc][Oo][Uu][Nn][Tt][Yy]\ [Rr][Oo][Aa][Dd]\ \d{2})
+            (?:[Cc][Oo][Uu][Nn][Tt][Yy]\ [Rr][Oo][Aa][Dd]\ \d{2}) |
+            (?:(?:[Uu][Ss]\ )?[Hh][Ww][Yy]\ \d{2,3}) |
+            (?:(?:[Uu][Ss]\ )?[Hh][Ii][Gg][Hh][Ww][Aa][Yy]\ \d{2,3}) |
+            (?:(?:[Uu][Ss]\ )?[Rr][Oo][Uu][Tt][Ee]\ \d{1,3})
         )
 """
 
@@ -375,7 +424,7 @@ occupancy = r"""
 
 po_box = r"""
             (?:
-                [Pp]\.?\ ?[Oo]\.?.{,3}[Bb][Oo][Xx]\ \d+
+                [Pp](?:ost)?\.?\ ?[Oo](?:ffice)?\.?.{,3}[Bb][Oo][Xx]\ \d+
             )
         """
 
