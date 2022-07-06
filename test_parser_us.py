@@ -195,7 +195,7 @@ def test_street_type(input, expected):
     ("CoUnty RoAd 19", True),
     ("US HwY 999", True),
     ("Highway 12", True),
-    ("us rouTE 2", True)
+    ("us rouTE 2", True),
 ])
 def test_special_streets(input, expected):
     ''' tests string match for special road types'''
@@ -434,6 +434,9 @@ def test_full_street_positive(input, expected):
     ("1500 Westlake Avenue North Suite 108 Seattle, WA 98109", True),
     ("840 Garrison Brooks Suite 985, New Sarah, OH 38255", True),
     ("840 Garrison Brooks Suite 985 New Sarah, OH 38255", True),
+    ("840 Garrison Brooks Suite 985 New Sarah, State of Michigan 38255", True),
+    ("840 Garrison Brooks Rm. #985 New Sarah, commonwealth of Michigan 38255", True),
+    ("1090 1100 E, Salt Lake City, UT 84105", True),
     # negative assertions
     ("85 STEEL REGULAR SHAFT - NE", False),
     ("3 STRUCTURE WITH PE", False),
@@ -488,6 +491,10 @@ def test_postal_code(input, expected):
     ("DC", True),
     ("PuErTO RIco", True),
     ("oregon", True),
+    ("state of michigan", True),
+    ("State of FLORiDA", True),
+    ("Commonwealth of Kentucky", True),
+    ("commonWEALTH OF Pennsylvania", True)
 ])
 def test_region1(input, expected):
     ''' test exact string match for province '''

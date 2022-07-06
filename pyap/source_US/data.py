@@ -343,7 +343,8 @@ special_streets = r"""
             (?:[Cc][Oo][Uu][Nn][Tt][Yy]\ [Rr][Oo][Aa][Dd]\ \d{2}) |
             (?:(?:[Uu][Ss]\ )?[Hh][Ww][Yy]\ \d{2,3}) |
             (?:(?:[Uu][Ss]\ )?[Hh][Ii][Gg][Hh][Ww][Aa][Yy]\ \d{2,3}) |
-            (?:(?:[Uu][Ss]\ )?[Rr][Oo][Uu][Tt][Ee]\ \d{1,3})
+            (?:(?:[Uu][Ss]\ )?[Rr][Oo][Uu][Tt][Ee]\ \d{1,3}) |
+            (?:\b(?:[NSEW]\ )?\d{2,4}\ [NSEW]\b(?=.{0,50}UT|[Uu][Tt][Aa][Hh]))
         )
 """
 
@@ -516,6 +517,8 @@ region1 = r"""
                 [Vv]\.?[Ii]
             )\b
             |
+            (?:[Ss][Tt][Aa][Tt][Ee]\ [Oo][Ff]\ )?
+            (?:[Cc][Oo][Mm][Mm][Oo][Nn][Ww][Ee][Aa][Ll][Tt][Hh]\ [Oo][Ff]\ )?
             (?:
                 # states full
                 [Aa][Ll][Aa][Bb][Aa][Mm][Aa]|
