@@ -27,21 +27,21 @@ common_div = r'[\ |\,|\-|\||٠∙•••●▪\\\/;]{0,3}'
 restrictive_div = r'[\.\ \,]{0,3}'
 
 zero_to_nine = r"""(?:
-    [Zz][Ee][Rr][Oo]\ |[Oo][Nn][Ee]\ |[Tt][Ww][Oo]\ |
-    [Tt][Hh][Rr][Ee][Ee]\ |[Ff][Oo][Uu][Rr]\ |
-    [Ff][Ii][Vv][Ee]\ |[Ss][Ii][Xx]\ |
-    [Ss][Ee][Vv][Ee][Nn]\ |[Ee][Ii][Gg][Hh][Tt]\ |
-    [Nn][Ii][Nn][Ee]\ |[Tt][Ee][Nn]\ |
-    [Ee][Ll][Ee][Vv][Ee][Nn]\ |
-    [Tt][Ww][Ee][Ll][Vv][Ee]\ |
-    [Tt][Hh][Ii][Rr][Tt][Ee][Ee][Nn]\ |
-    [Ff][Oo][Uu][Rr][Tt][Ee][Ee][Nn]\ |
-    [Ff][Ii][Ff][Tt][Ee][Ee][Nn]\ |
-    [Ss][Ii][Xx][Tt][Ee][Ee][Nn]\ |
-    [Ss][Ee][Vv][Ee][Nn][Tt][Ee][Ee][Nn]\ |
-    [Ee][Ii][Gg][Hh][Tt][Ee][Ee][Nn]\ |
-    [Nn][Ii][Nn][Ee][Tt][Ee][Ee][Nn]\ 
-    )"""
+    [Zz][Ee][Rr][Oo]|[Oo][Nn][Ee]|[Tt][Ww][Oo]|
+    [Tt][Hh][Rr][Ee][Ee]|[Ff][Oo][Uu][Rr]|
+    [Ff][Ii][Vv][Ee]|[Ss][Ii][Xx]|
+    [Ss][Ee][Vv][Ee][Nn]|[Ee][Ii][Gg][Hh][Tt]|
+    [Nn][Ii][Nn][Ee]|[Tt][Ee][Nn]|
+    [Ee][Ll][Ee][Vv][Ee][Nn]|
+    [Tt][Ww][Ee][Ll][Vv][Ee]|
+    [Tt][Hh][Ii][Rr][Tt][Ee][Ee][Nn]|
+    [Ff][Oo][Uu][Rr][Tt][Ee][Ee][Nn]|
+    [Ff][Ii][Ff][Tt][Ee][Ee][Nn]|
+    [Ss][Ii][Xx][Tt][Ee][Ee][Nn]|
+    [Ss][Ee][Vv][Ee][Nn][Tt][Ee][Ee][Nn]|
+    [Ee][Ii][Gg][Hh][Tt][Ee][Ee][Nn]|
+    [Nn][Ii][Nn][Ee][Tt][Ee][Ee][Nn]
+    )\ """
 
 # Numerals - 10, 20, 30 ... 90
 ten_to_ninety = r"""(?:
@@ -113,15 +113,21 @@ street_number_follow_exclusions = r"""
                                     [Ll]ike|
                                     [Ww]hen|
                                     [Tt]his|
+                                    [Ww]hile|
 
-                                    (?:.{0,10}(:[Ss]q.?(?:uare)?\ )?[Ff](?:ee)?t\.?)|
+                                    (?:.{0,50}(?=[Ss]q\.?(?:uare)?\,?\ )?[Ff](?:ee)?t\.?)|
                                     (?:[Pp]er(?:\,?\ ?cent)?\b)|
-                                    (?:[12][90]\d{2}\W{0,6}\d{1,2}(?:[Ss]t|[Nn]d|[Rr]d|[Tt]h))|
+                                    (?:(?<=[12][90]\d{2}\D{3})\d(?:[Ss]t|[Nn]d|[Rr]d|[Tt]h)\ [Pp]lace)|
+                                    (?:(?<=\b3-[Dd]\s)[Pp]rint(?:e[rd])?)|
+                                    (?:(?<=\b[Ss]ix\s)[Ss]igma)|
 
                                     [Bb]asis|
                                     [Tt]ransactions|
                                     [Ee]xt|
-                                    [Ff]ax
+                                    [Ff]ax|
+                                    [Gg]rade\ [Pp]oint\ [Aa]verage|
+                                    [Vv]olunteering|
+                                    [Ww]all [Ss]treet [Jj]ournal
                                 )\b
                             """
 
@@ -145,16 +151,16 @@ street_number = r"""(?P<street_number>
                             {zero_to_nine}
                             |
                             {ten_to_ninety}
-                        ){{0,4}}\,
+                        ){{0,4}}\,?
                         |
                         (?:
                             (?:\d|{post_number_directions}){from_to}
                             (?:\ ?\-?\ ?\d{from_to})?\ 
-                            (?!
-                                \D{{0,4}}
-                                {exclusions}
-                            )
                         )
+                    )
+                    (?!
+                        \D{{0,4}}
+                        {exclusions}
                     )
                 """.format(thousand=thousand,
                            hundred=hundred,
@@ -170,10 +176,10 @@ In example below:
 "Hoover Boulevard": "Hoover" is a street name
 '''
 street_name = r"""(?P<street_name>
-                  [a-zA-Z0-9\ \.\-]{3,31}  # Seems like the longest US street is
-                                         # 'Northeast Kentucky Industrial Parkway'
-                                         # https://atkinsbookshelf.wordpress.com/tag/longest-street-name-in-us/
-                 )
+                        (?:[a-zA-Z0-9\ \.\-]{3,31})
+                    |
+                        (?:\b[A-Za-z]\b(?=.{4,50}\bDC\b))
+                    )
               """
 
 post_direction = r"""
@@ -409,6 +415,9 @@ occupancy = r"""
                             |
                             #Units
                             [Uu][Nn][Ii][Tt]\ 
+                            |
+                            #Terrace
+                            [Tt][Ee][Rr]{2}[Aa][Cc][Ee]\ 
                         )
                         (?:
                             [A-Za-z\#\&\-\d]{1,7}
@@ -424,7 +433,7 @@ occupancy = r"""
 
 po_box = r"""
             (?:
-                [Pp](?:ost)?\.?\ ?[Oo](?:ffice)?\.?.{,3}[Bb][Oo][Xx]\ \d+
+                (?:[Pp](?:ost)?\.?\ ?[Oo](?:ffice)?\.?)?.{,3}[Bb][Oo][Xx]\ \d+
             )
         """
 
@@ -445,7 +454,7 @@ full_street = r"""
             |
             (?:
                 {dorm}?\,?\ ?
-                {street_number}
+                {street_number}\s{{0,6}}
                 (?:
                     (?:{special_streets}\,?\ ?)
                     |

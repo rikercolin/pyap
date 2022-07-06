@@ -35,7 +35,7 @@ def execute_matching_test(input, expected, pattern):
     ("Eight ", True),
     ("Nine ", True),
     # negative assertions
-    ("Nidnes", False),
+    ("Nidnes ", False),
     ("One", False),
     ("two", False),
     ("onetwothree ", False),
@@ -144,16 +144,15 @@ def test_street_name(input, expected):
 
 @pytest.mark.parametrize("input,expected", [
     # positive assertions
-    ("N. ", True),
-    ("N ", True),
-    ("S ", True),
+    ("N.", True),
+    ("N", True),
+    ("S", True),
     ("West ", True),
     ("eASt ", True),
-    ("NW ", True),
-    ("SE ", True),
+    ("NW", True),
+    ("SE", True),
+    ("NW.", True),
     # negative assertions
-    ("NW.", False),
-    ("NW. ", False),
     ("NS ", False),
     ("EW ", False),
 ])
@@ -189,6 +188,18 @@ def test_post_direction(input, expected):
 def test_street_type(input, expected):
     ''' tests string match for a street id '''
     execute_matching_test(input, expected, data_us.street_type)
+
+@pytest.mark.parametrize("input,expected", [
+    # positive assertions
+    ("OH-34", True),
+    ("CoUnty RoAd 19", True),
+    ("US HwY 999", True),
+    ("Highway 12", True),
+    ("us rouTE 2", True)
+])
+def test_special_streets(input, expected):
+    ''' tests string match for special road types'''
+    execute_matching_test(input, expected, data_us.special_streets)
 
 
 @pytest.mark.parametrize("input,expected", [
@@ -254,7 +265,7 @@ def test_building(input, expected):
     ("Apt 1B ", True),
     ("Rm. 52 ", True),
     ("#2b ", True),
-    # positive assertions
+    # negative assertions
     ("suite900 ", False),
     ("Suite#2", False),
     ("suite218 ", False),
@@ -262,6 +273,17 @@ def test_building(input, expected):
 def test_occupancy(input, expected):
     ''' tests string match for a place id '''
     execute_matching_test(input, expected, data_us.occupancy)
+
+@pytest.mark.parametrize("input,expected", [
+    # positive assertions
+    ("Suite 40 Big Hall", True),
+    ("Rm A300 Pine haLl", True),
+    # negative assertions
+    ("Rm A300 Pine center", False),
+])
+def test_dorm(input, expected):
+    ''' tests string match for a dorm'''
+    execute_matching_test(input, expected, data_us.dorm)
 
 
 @pytest.mark.parametrize("input,expected", [
@@ -461,6 +483,8 @@ def test_postal_code(input, expected):
     ("Montana", True),
     ("Nebraska", True),
     ("NJ", True),
+    ("nJ", True),
+    ("mi", True),
     ("DC", True),
     ("PuErTO RIco", True),
     ("oregon", True),
