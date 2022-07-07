@@ -115,7 +115,7 @@ In example below:
 "Hoover Boulevard": "Hoover" is a street name
 '''
 street_name = r"""(?P<street_name>
-                  \w[\w0-9\'\-\ \.]{0,30}?
+                  .{0,30}?
                  )
               """
 
@@ -144,9 +144,9 @@ post_direction = r"""
                         |
                         (?:
                             # English
-                            NW{d}|NE{d}|SW{d}|SE{d}|
+                            N\.?W\.?{d}|N\.?E\.?{d}|S\.?W\.?{d}|S\.?E\.?{d}|
                             # French (missing above)
-                            NO{d}|SO{d}
+                            N\.?O\.?{d}|S\.?O\.?{d}
                         )
                         |
                         (?:
