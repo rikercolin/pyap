@@ -308,12 +308,22 @@ street_type = r"""
 
 floor = r"""
             (?P<floor>
+                #English
                 (?:
-                \d+[A-Za-z]{0,2}\.?\ [Ff][Ll][Oo][Oo][Rr]\ 
+                    \d+[A-Za-z]{0,2}\.?\ [Ff][Ll](?:[Oo][Oo])?[Rr][\.,\ ]
                 )
                 |
                 (?:
-                    [Ff][Ll][Oo][Oo][Rr]\ \d+[A-Za-z]{0,2}\ 
+                    [Ff][Ll](?:[Oo][Oo])?[Rr]\ \d+[A-Za-z]{0,2}[\.,\ ]
+                )
+                |
+                #French
+                (?:
+                    \d+[A-Za-z]{0,3}\.?\ [Éé][Tt][Aa][Gg][Ee][\.,\ ]
+                )
+                |
+                (?:
+                    [Éé][Tt][Aa][Gg][Ee]\ \d+[A-Za-z]{0,3}[\.,\ ]
                 )
             )
         """
