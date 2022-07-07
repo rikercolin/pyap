@@ -348,6 +348,10 @@ occupancy = r"""
                         # Unit
                         [Uu][Nn][Ii][Tt]\ 
                         |
+                        # Level
+                        [Uu][Pp][Pp][Ee][Rr]\ [Ll][Ee][Vv][Ee][Ll]|
+                        [Ll][Oo][Ww][Ee][Rr]\ [Ll][Ee][Vv][Ee][Ll]
+                        |
                         #
                         # French
                         #
