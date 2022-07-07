@@ -436,7 +436,7 @@ full_street = r"""
         # Format commonly used in French
         (?P<full_street_b>
             (?:
-                {po_box_d}
+                {po_box_d}\,?\ ?
             )
             |
             (?:
@@ -451,7 +451,7 @@ full_street = r"""
         # Format commonly used in English
         (?P<full_street>
             (?:
-                {po_box_c}
+                {po_box_c}\,?\ ?
             )
             |
             (?:
@@ -494,7 +494,7 @@ full_street = r"""
                 po_box_d=po_box_d,
                 po_box_positive_lookahead=po_box_positive_lookahead,
 
-                div='[\ ,]{1,2}',
+                div='[\ |\,|\-|\||٠∙•••●▪\\\/;]{1,2}',
                 )
 
 # region1 here is actually a "province"
@@ -584,7 +584,7 @@ full_address = r"""
                 )
                 """.format(
     full_street=full_street,
-    div='[\, ]{,2}',
+    div='[\ |\,|\-|\||٠∙•••●▪\\\/;]{,2}',
     city=city,
     region1=region1,
 
