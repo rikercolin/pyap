@@ -122,6 +122,9 @@ street_number_follow_exclusions = r"""
                                     (?:(?<=\b[Ss]ix\s)[Ss]igma)|
 
                                     [Bb]asis|
+                                    [Cc]ommunications|
+                                    [Cc][Oo][Uu][Nn][Tt][Ee][Rr][Pp][Aa][Rr][Tt][Ii][Ee][Ss]|
+                                    [Dd]istribution|
                                     [Tt]ransactions|
                                     [Ee]xt|
                                     [Ff]ax|
