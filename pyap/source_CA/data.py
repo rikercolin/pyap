@@ -373,20 +373,29 @@ occupancy = r"""
 
 po_box = r"""
             (?P<postal_box>
-                # English - PO Box 123
-                (?:[Pp]\.?\ ?[Oo]\.?\ [Bb][Oo][Xx]\ \d+)
-                |
-                # French - B.P. 123
-                (?:[Bb]\.?\ [Pp]\.?\ \d+)
-                |
-                # C.P. 123
-                (?:[Cc]\.?\ [Pp]\.?\ \d+)
-                |
-                # Case postale 123
-                (?:[Cc]ase\ [Pp][Oo][Ss][Tt][Aa][Ll][Ee]\ \d+)
-                |
-                # C.P. 123
-                (?:[Cc]\.[Pp]\.\ \d+)
+                (?:
+                    # English - PO Box 123
+                    (?:[Pp]\.?\ ?[Oo]\.?\ [Bb][Oo][Xx]\ \d+)
+                    |
+                    # French - B.P. 123
+                    (?:[Bb]\.?\ [Pp]\.?\ \d+)
+                    |
+                    # C.P. 123
+                    (?:[Cc]\.?\ [Pp]\.?\ \d+)
+                    |
+                    # Case postale 123
+                    (?:[Cc]ase\ [Pp][Oo][Ss][Tt][Aa][Ll][Ee]\ \d+)
+                    |
+                    # C.P. 123
+                    (?:[Cc]\.[Pp]\.\ \d+)
+                )
+                (?:[\ ,]{1,3}
+                    (?:
+                        (?:[Ss][Tt][Aa][Tt][Ii][Oo][Nn])|
+                        (?:[Ss][Tt][Nn]\.?)
+                    )
+                    \ [\“\'\"]?[A-Z][\”\'\"]?
+                )?
             )
         """
 
@@ -397,6 +406,8 @@ street_number_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_number)
 street_name_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_name)
 street_type_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_type)
 po_box_b = re.sub('<([a-z\_]+)>', r'<\1_b>', po_box)
+po_box_c = re.sub('<([a-z\_]+)>', r'<\1_c>', po_box)
+po_box_d = re.sub('<([a-z\_]+)>', r'<\1_d>', po_box)
 post_direction_b = re.sub('<([a-z\_]+)>', r'<\1_b>', post_direction)
 
 po_box_positive_lookahead = r"""
@@ -424,32 +435,42 @@ full_street = r"""
     (?:
         # Format commonly used in French
         (?P<full_street_b>
-
-            {street_number_b}{div}
-            {street_type_b}{div}
-            ({street_name_b} {po_box_positive_lookahead})?\,?\ ?
-            {post_direction_b}?\,?\ ?
-            {po_box_b}?\,?\ ?
+            (?:
+                {po_box_d}
+            )
+            |
+            (?:
+                {street_number_b}{div}
+                {street_type_b}{div}
+                ({street_name_b} {po_box_positive_lookahead})?\,?\ ?
+                {post_direction_b}?\,?\ ?
+                {po_box_b}?\,?\ ?
+            )
         )
         |
         # Format commonly used in English
         (?P<full_street>
+            (?:
+                {po_box_c}
+            )
+            |
+            (?:
+                {street_number}\,?\ ?
+                {street_name}?\,?\ ?
+                (?:(?<=[\ \,]){street_type})\,?\ ?
+                {post_direction}?\,?\ ?
+                {floor}?\,?\ ?
 
-            {street_number}\,?\ ?
-            {street_name}?\,?\ ?
-            (?:(?<=[\ \,]){street_type})\,?\ ?
-            {post_direction}?\,?\ ?
-            {floor}?\,?\ ?
+                (?P<building_id>
+                    {building}
+                )?\,?\ ?
 
-            (?P<building_id>
-                {building}
-            )?\,?\ ?
+                (?P<occupancy>
+                    {occupancy}
+                )?\,?\ ?
 
-            (?P<occupancy>
-                {occupancy}
-            )?\,?\ ?
-
-            {po_box}?
+                {po_box}?
+            )
         )
     )""".format(street_number=street_number,
                 street_number_b=street_number_b,
@@ -469,6 +490,8 @@ full_street = r"""
 
                 po_box=po_box,
                 po_box_b=po_box_b,
+                po_box_c=po_box_c,
+                po_box_d=po_box_d,
                 po_box_positive_lookahead=po_box_positive_lookahead,
 
                 div='[\ ,]{1,2}',
