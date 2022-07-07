@@ -75,6 +75,15 @@ Street number can be written 2 ways:
 '''
 street_number = r"""(?<![\.0-9])(?P<street_number>
                         (?:
+                            {thousand}
+                            |
+                            {hundred}
+                            |
+                            {zero_to_nine}
+                            |
+                            {ten_to_ninety}
+                        )
+                        (?:
                             [Aa][Nn][Dd]\ 
                             |
                             {thousand}
@@ -84,7 +93,7 @@ street_number = r"""(?<![\.0-9])(?P<street_number>
                             {zero_to_nine}
                             |
                             {ten_to_ninety}
-                        ){from_to}
+                        ){{0,4}}\,?
                         |
                         # 85th - 1190
                         (?:\d{from_to}(?:th)?
@@ -515,13 +524,6 @@ full_street = r"""
 region1 = r"""
         (?P<region1>
             (?:
-                # province abbreviations (English)
-                A\.?B\.?|B\.?C\.?|M\.?B\.?|N\.?B\.?|N\.?L\.?|
-                N\.?T\.?|N\.?S\.?|N\.?U\.?|O\.?N\.?|P\.?E\.?|
-                Q\.?C\.?|S\.?K\.?|Y\.?T\.?
-            )
-            |
-            (?:
                 # provinces full (English)
                 [Aa][Ll][Bb][Ee][Rr][Tt][Aa]|
                 [Bb][Rr][Ii][Tt][Ii][Ss][Hh]\ [Cc][Oo][Ll][Uu][Mm][Bb][Ii][Aa]|
@@ -554,7 +556,38 @@ region1 = r"""
                 [ÉéEe][Dd][Oo][Uu][Aa][Rr][Dd]|
                 [Qq][Uu][Éé][Bb][Ee][Cc]
             )
-        )
+            |
+            (?:
+                # postal province abbreviations
+                [Aa]\.?[Bb]\.?|
+                [Bb]\.?[Cc]\.?|
+                [Mm]\.?[Bb]\.?|
+                [Nn]\.?[Bb]\.?|
+                [Nn]\.?[Ll]\.?|
+                [Nn]\.?[Tt]\.?|
+                [Nn]\.?[Ss]\.?|
+                [Nn]\.?[Uu]\.?|
+                [Oo]\.?[Nn]\.?|
+                [Pp]\.?[Ee]\.?|
+                [Qq]\.?[Cc]\.?|
+                [Ss]\.?[Kk]\.?|
+                [Yy]\.?[Tt]\.?
+            )
+            |
+            (?:
+                #traditional abbreviation (English)
+                [Aa]lta\.?|
+                [Mm]an\.?|
+                [Nn]fld[\.,]{,2} [Ll]ab\.?|
+                [Nn]\.?[Ww]\.?[Tt]\.?|
+                [N]vt\.?|
+                [Oo]nt\.?|
+                [Pp]\.?[Ee]\.?[Ii]\.?|
+                [Q]ue\.?|
+                [Ss]ask\.?|
+                [Yy]uk\.?
+            )
+        )\b
         """
 
 city = r"""
