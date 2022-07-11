@@ -22,6 +22,20 @@ instead of '(one)(?i)' to match 'One' or 'oNe' because
 Python Regexps don't seem to support turning On/Off
 case modes for subcapturing groups.
 '''
+first_to_tenth = r"""(?:
+    [Ff][Ii][Rr][Ss][Tt]\ |
+    [Ss][Ee][Cc][Oo][Nn][Dd]\ |
+    [Tt][Hh][Ii][Rr][Dd]\ |
+    [Ff][Oo][Uu][Rr][Tt][Hh]\ |
+    [Ff][Ii][Ff][Tt][Hh]\ |
+    [Ss][Ii][Xx][Tt][Hh]\ |
+    [Ss][Ee][Vv][Ee][Nn][Tt][Hh]\ |
+    [Ee][Ii][Gg][Hh][Tt][Hh]\ |
+    [Nn][Ii][Nn][Tt][Hh]\ |
+    [Tt][Ee][Nn][Tt][Hh]\ 
+    )
+"""
+
 zero_to_nine = r"""(?:
     [Zz][Ee][Rr][Oo]\ |[Oo][Nn][Ee]\ |[Tt][Ww][Oo]\ |
     [Tt][Hh][Rr][Ee][Ee]\ |[Ff][Oo][Uu][Rr]\ |
@@ -319,23 +333,32 @@ floor = r"""
             (?P<floor>
                 #English
                 (?:
-                    \d+[A-Za-z]{0,2}\.?\ [Ff][Ll](?:[Oo][Oo])?[Rr][\.,\ ]
+                    (?:
+                        (?:\d+[A-Za-z]{{0,2}}\.?\ )|
+                        (?:{first_to_tenth})
+                    )
+                    [Ff][Ll](?:[Oo][Oo])?[Rr][\.,\ ;]
                 )
                 |
                 (?:
-                    [Ff][Ll](?:[Oo][Oo])?[Rr]\ \d+[A-Za-z]{0,2}[\.,\ ]
+                    [Ff][Ll](?:[Oo][Oo])?[Rr]\ 
+                    (?:
+                        (?:\d+[A-Za-z]{{0,2}}[\.,\ ;])|
+                        (?:{zero_to_nine})
+                    )
                 )
                 |
                 #French
                 (?:
-                    \d+[A-Za-z]{0,3}\.?\ [Éé][Tt][Aa][Gg][Ee][\.,\ ]
+                    \d+[A-Za-z]{{0,3}}\.?\ [Éé][Tt][Aa][Gg][Ee][\.,\ ]
                 )
                 |
                 (?:
-                    [Éé][Tt][Aa][Gg][Ee]\ \d+[A-Za-z]{0,3}[\.,\ ]
+                    [Éé][Tt][Aa][Gg][Ee]\ \d+[A-Za-z]{{0,3}}[\.,\ ]
                 )
             )
-        """
+        """.format(first_to_tenth=first_to_tenth,
+                   zero_to_nine=zero_to_nine)
 
 building = r"""
             (?:
@@ -396,21 +419,18 @@ occupancy = r"""
 
 po_box = r"""
             (?P<postal_box>
-                (?:
+                \b(?:
                     # English - PO Box 123
-                    (?:[Pp]\.?\ ?[Oo]\.?\ [Bb][Oo][Xx]\ \d+)
+                    (?:[Pp][\ \.]{0,2}[Oo][\ \.]{0,2}[Bb][Oo][Xx]\ \d+)
                     |
                     # French - B.P. 123
-                    (?:[Bb]\.?\ [Pp]\.?\ \d+)
+                    (?:[Bb][\ \.]{0,2}[Pp][\ \.]{0,2}\d+)
                     |
-                    # C.P. 123
-                    (?:[Cc]\.?\ [Pp]\.?\ \d+)
+                    # C.P. 123 CP123 CP 123 C.P123 C.P.123 etc
+                    (?:[Cc][\ \.]{0,2}[Pp][\ \.]{0,2}\d+)
                     |
                     # Case postale 123
                     (?:[Cc]ase\ [Pp][Oo][Ss][Tt][Aa][Ll][Ee]\ \d+)
-                    |
-                    # C.P. 123
-                    (?:[Cc]\.[Pp]\.\ \d+)
                 )
             )
         """
@@ -432,6 +452,9 @@ station = r"""
 street_number_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_number)
 street_name_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_name)
 street_type_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_type)
+
+floor_b = re.sub('<([a-z\_]+)>', r'<\1_b>', floor)
+floor_c = re.sub('<([a-z\_]+)>', r'<\1_c>', floor)
 
 po_box_b = re.sub('<([a-z\_]+)>', r'<\1_b>', po_box)
 po_box_c = re.sub('<([a-z\_]+)>', r'<\1_c>', po_box)
@@ -487,14 +510,16 @@ full_street = r"""
         # Format commonly used in English
         (?P<full_street>
             (?:
+                {floor_c}?\,?\ ?
                 {po_box_c}\,?\ ?
                 {station_c}?\,?\ ?
             )
             |
             (?:
+                {floor_b}?\,?\ ?
                 {street_number}\,?\ ?
                 {street_name}?\,?\ ?
-                (?:(?<=[\ \,]){street_type})\,?\ ?
+                (?:(?<=[\ \,]){street_type}){div}
                 {post_direction}?\,?\ ?
                 {floor}?\,?\ ?
 
@@ -523,6 +548,8 @@ full_street = r"""
                 post_direction_b=post_direction_b,
 
                 floor=floor,
+                floor_b=floor_b,
+                floor_c=floor_c,
                 building=building,
                 occupancy=occupancy,
 
