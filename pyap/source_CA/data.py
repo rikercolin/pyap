@@ -170,7 +170,7 @@ post_direction = r"""
                             O[\.\ ]
                         )
                     )
-                """.format(d='[\ ,]')
+                """.format(d='[\.\ ,]')
 
 # Regexp for matching street type
 # According to
@@ -437,10 +437,14 @@ po_box = r"""
 
 station = r"""
                 (?P<station>
-                    (?:[Pp][Oo][Ss][Tt][Aa][Ll]\ )?
+                    (?:[Pp][Oo][Ss][Tt][Aa][Ll][Ee]?\ )?
                     (?:
+                        #English
                         (?:[Ss][Tt][Aa][Tt][Ii][Oo][Nn])|
-                        (?:[Ss][Tt][Nn]\.?)
+                        (?:[Ss][Tt][Nn]\.?)|
+                        #French
+                        (?:[Ss][Uu][Cc][Cc][Uu][Rr][Ss][Aa][Ll][Ee])
+                        (?:[Ss][Uu][Cc][Cc]\.?)|
                     )
                     \ [\“\'\"]?.{0,13}[\”\'\"]?
                 )
@@ -455,6 +459,9 @@ street_type_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_type)
 
 floor_b = re.sub('<([a-z\_]+)>', r'<\1_b>', floor)
 floor_c = re.sub('<([a-z\_]+)>', r'<\1_c>', floor)
+floor_d = re.sub('<([a-z\_]+)>', r'<\1_d>', floor)
+floor_e = re.sub('<([a-z\_]+)>', r'<\1_e>', floor)
+floor_f = re.sub('<([a-z\_]+)>', r'<\1_f>', floor)
 
 po_box_b = re.sub('<([a-z\_]+)>', r'<\1_b>', po_box)
 po_box_c = re.sub('<([a-z\_]+)>', r'<\1_c>', po_box)
@@ -493,15 +500,18 @@ full_street = r"""
         # Format commonly used in French
         (?P<full_street_b>
             (?:
+                {floor_f}?\,?\ ?
                 {po_box_d}\,?\ ?
                 {station_d}?\,?\ ?
             )
             |
             (?:
+                {floor_e}?\,?\ ?
                 {street_number_b}{div}
-                {street_type_b}{div}
+                (?:{street_type_b}{div})?
                 ({street_name_b} {po_box_positive_lookahead})?\,?\ ?
                 {post_direction_b}?\,?\ ?
+                {floor_d}?\,?\ ?
                 {po_box_b}?\,?\ ?
                 {station_b}?\,?\ ?
             )
@@ -519,7 +529,7 @@ full_street = r"""
                 {floor_b}?\,?\ ?
                 {street_number}\,?\ ?
                 {street_name}?\,?\ ?
-                (?:(?<=[\ \,]){street_type}){div}
+                (?:(?:(?<=[\ \,]){street_type}){div})?
                 {post_direction}?\,?\ ?
                 {floor}?\,?\ ?
 
@@ -550,6 +560,10 @@ full_street = r"""
                 floor=floor,
                 floor_b=floor_b,
                 floor_c=floor_c,
+                floor_d=floor_d,
+                floor_e=floor_e,
+                floor_f=floor_f,
+
                 building=building,
                 occupancy=occupancy,
 
@@ -568,9 +582,9 @@ full_street = r"""
                 div='[\ |\,|\-|\||٠∙•••●▪\\\/;]{1,2}',
                 )
 
-# region1 here is actually a "province"
-region1 = r"""
-        (?P<region1>
+# province here is actually a "province"
+province = r"""
+        (?P<province>
             (?:
                 # provinces full (English)
                 [Aa][Ll][Bb][Ee][Rr][Tt][Aa]|
@@ -603,7 +617,7 @@ region1 = r"""
                 [ÎîIi][Ll][Ee]\-[Dd][Uu]\-[Pp][Rr][Ii][Nn][Cc][Ee]\-
                 [ÉéEe][Dd][Oo][Uu][Aa][Rr][Dd]|
                 [Qq][Uu][Éé][Bb][Ee][Cc]
-            )
+            )\b
             |
             (?:
                 # postal province abbreviations
@@ -620,7 +634,7 @@ region1 = r"""
                 [Qq]\.?[Cc]\.?|
                 [Ss]\.?[Kk]\.?|
                 [Yy]\.?[Tt]\.?
-            )
+            )\b
             |
             (?:
                 #traditional abbreviation (English)
@@ -634,8 +648,8 @@ region1 = r"""
                 [Q]ue\.?|
                 [Ss]ask\.?|
                 [Yy]uk\.?
-            )
-        )\b
+            )\b
+        )
         """
 
 city = r"""
@@ -656,24 +670,32 @@ postal_code = r"""
 
 country = r"""
             (?:
-                [Cc][Aa][Nn][Aa][Dd][Aa]
+                [Cc][Aa](?:[Nn][Aa][Dd][Aa])?
             )
             """
 
 # define detection rules for postal code placed in different parts of address
-postal_code_b = re.sub('<([a-z\_]+)>', r'<\1_b>', postal_code)
-postal_code_c = re.sub('<([a-z\_]+)>', r'<\1_c>', postal_code)
+postal_code_y1 = re.sub('<([a-z\_]+)>', r'<\1_y1>', postal_code)
+postal_code_y2 = re.sub('<([a-z\_]+)>', r'<\1_y2>', postal_code)
+
+province_x1 = re.sub('<([a-z\_]+)>', r'<\1_y1>', province)
+province_x2 = re.sub('<([a-z\_]+)>', r'<\1_y2>', province)
 
 full_address = r"""
                 (?P<full_address>
                     {full_street} {div}
                     {city} {div}
-                    (?:{postal_code_c} {div})?
-                    \(?{region1}[\)\.]? {div}
+
+                    #Either X or Y Must be True : You must have a Postcode or Province
                     (?:
+                        #Postcode required (X expression)
                         (?:
-                            {postal_code}? {div} {country}? 
-                            (?:{div} {postal_code_b})?
+                            {postal_code} (?: {div} (?:{province_x1} {div} {country}?) | (?:{country} {div} {province_x2}?) )?
+                        )
+                        |
+                        #Province required (Y expression)
+                        (?:
+                            {province} (?: {div} (?:{postal_code_y1} {div} {country}?) | (?:{country} {div} {postal_code_y2}?) )?
                         )
                     )
                 )
@@ -681,12 +703,14 @@ full_address = r"""
     full_street=full_street,
     div='[\ |\,|\-|\||٠∙•••●▪\\\/;]{,2}',
     city=city,
-    region1=region1,
+
+    province=province,
+    province_x1=province_x1,
+    province_x2=province_x2,
 
     country=country,
-    country_b=country,
 
     postal_code=postal_code,
-    postal_code_b=postal_code_b,
-    postal_code_c=postal_code_c,
+    postal_code_y1=postal_code_y1,
+    postal_code_y2=postal_code_y2,
 )
