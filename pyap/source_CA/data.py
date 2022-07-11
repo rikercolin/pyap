@@ -115,7 +115,7 @@ In example below:
 "Hoover Boulevard": "Hoover" is a street name
 '''
 street_name = r"""(?P<street_name>
-                  .{0,30}?
+                  (?:.|[\n\r]){0,30}?
                  )
               """
 
@@ -412,15 +412,18 @@ po_box = r"""
                     # C.P. 123
                     (?:[Cc]\.[Pp]\.\ \d+)
                 )
-                (?:[\ ,]{1,3}
+            )
+        """
+
+station = r"""
+                (?P<station>
                     (?:
                         (?:[Ss][Tt][Aa][Tt][Ii][Oo][Nn])|
                         (?:[Ss][Tt][Nn]\.?)
                     )
-                    \ [\“\'\"]?[A-Z][\”\'\"]?
-                )?
-            )
-        """
+                    \ [\“\'\"]?[A-Z\d]{,6}[\”\'\"]?
+                )
+"""
 
 '''Define detection rules for a second type of address format
    (the French one)
@@ -428,9 +431,16 @@ po_box = r"""
 street_number_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_number)
 street_name_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_name)
 street_type_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_type)
+
 po_box_b = re.sub('<([a-z\_]+)>', r'<\1_b>', po_box)
 po_box_c = re.sub('<([a-z\_]+)>', r'<\1_c>', po_box)
 po_box_d = re.sub('<([a-z\_]+)>', r'<\1_d>', po_box)
+
+station_b = re.sub('<([a-z\_]+)>', r'<\1_b>', station)
+station_c = re.sub('<([a-z\_]+)>', r'<\1_c>', station)
+station_d = re.sub('<([a-z\_]+)>', r'<\1_d>', station)
+
+
 post_direction_b = re.sub('<([a-z\_]+)>', r'<\1_b>', post_direction)
 
 po_box_positive_lookahead = r"""
@@ -460,6 +470,7 @@ full_street = r"""
         (?P<full_street_b>
             (?:
                 {po_box_d}\,?\ ?
+                {station_d}?\,?\ ?
             )
             |
             (?:
@@ -468,6 +479,7 @@ full_street = r"""
                 ({street_name_b} {po_box_positive_lookahead})?\,?\ ?
                 {post_direction_b}?\,?\ ?
                 {po_box_b}?\,?\ ?
+                {station_b}?\,?\ ?
             )
         )
         |
@@ -475,6 +487,7 @@ full_street = r"""
         (?P<full_street>
             (?:
                 {po_box_c}\,?\ ?
+                {station_c}?\,?\ ?
             )
             |
             (?:
@@ -493,6 +506,7 @@ full_street = r"""
                 )?\,?\ ?
 
                 {po_box}?
+                {station}?\,?\ ?
             )
         )
     )""".format(street_number=street_number,
@@ -515,6 +529,12 @@ full_street = r"""
                 po_box_b=po_box_b,
                 po_box_c=po_box_c,
                 po_box_d=po_box_d,
+
+                station=station,
+                station_b=station_b,
+                station_c=station_c,
+                station_d=station_d,
+
                 po_box_positive_lookahead=po_box_positive_lookahead,
 
                 div='[\ |\,|\-|\||٠∙•••●▪\\\/;]{1,2}',
