@@ -130,7 +130,7 @@ street_number_follow_exclusions = r"""
                                     [Ff]ax|
                                     [Gg]rade\ [Pp]oint\ [Aa]verage|
                                     [Vv]olunteering|
-                                    [Ww]all [Ss]treet [Jj]ournal
+                                    [Ww]all\ [Ss]treet\ [Jj]ournal
                                 )\b
                             """
 
