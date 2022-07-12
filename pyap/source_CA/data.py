@@ -110,12 +110,12 @@ street_number = r"""(?<![\.0-9])(?P<street_number>
                         ){{0,4}}\,?
                         |
                         # 85th - 1190
-                        (?:\d{from_to}(?:th)?
-                            (?:\ ?\-?\ ?\d{from_to}(?:th)?)?\ 
+                        (?:\d{from_to}(?:(?:th)|(?:rd)|(?:st))?
+                            (?:\ ?\-?\ ?\d{from_to}(?:(?:th)|(?:rd)|(?:st))?)?\ 
                         )
                         |
                         # 45
-                        (?:\d{from_to}(?=[\ ,]))
+                        (?:\d{from_to}\w?(?=[\ ,\-]))
                     )
                 """.format(thousand=thousand,
                            hundred=hundred,
@@ -157,6 +157,12 @@ post_direction = r"""
                         )
                         |
                         (?:
+                            Nth\.?{d}|
+                            Sth\.?{d}|
+                            Wst\.?{d}
+                        )
+                        |
+                        (?:
                             # English
                             N\.?W\.?{d}|N\.?E\.?{d}|S\.?W\.?{d}|S\.?E\.?{d}|
                             # French (missing above)
@@ -165,9 +171,7 @@ post_direction = r"""
                         |
                         (?:
                             # English
-                            N[\.\ ]|S[\.\ ]|E[\.\ ]|W[\.\ ]|
-                            # French (missing above)
-                            O[\.\ ]
+                            [NSEWO]{d}
                         )
                     )
                 """.format(d='[\.\ ,]')
@@ -186,7 +190,7 @@ street_type = r"""
                 [Bb][Aa][Yy]{div}|
                 [Bb][Ee][Aa][Cc][Hh]{div}|
                 [Bb][Ee][Nn][Dd]{div}|
-                [Bb][Oo][Uu][Ll][Ee][Vv][Aa][Er][Dd]{div}|[Bb][Ll][Vv][Dd]{div}|[Bb][Oo][Uu][Ll]{div}|
+                [Bb][Oo][Uu][Ll][Ee][Vv][Aa][Rr][Dd]{div}|[Bb][Ll][Vv][Dd]{div}|[Bb][Oo][Uu][Ll]{div}|[Bb][Ll]{div}|
                 # Broadway
                 [Bb][Rr][Oo][Aa][Dd][Ww][Aa][Yy]{div}|
                 [Bb][Yy]\-?[Pp][Aa][Ss][Ss]{div}|
@@ -210,6 +214,7 @@ street_type = r"""
                 [Cc][Oo][Uu][Rr]{div}|
                 [Cc][Oo][Uu][Rr][Tt]{div}|[Cc][Rr][Tt]{div}|
                 [Cc][Oo][Vv][Ee]{div}|
+                [Cc][Rr]{div}|
                 [Cc][Rr][Ee][Ss][Cc][Ee][Nn][Tt]{div}|[Cc][Rr][Ee][Ss]{div}|
                 [Cc][Rr][Oo][Ii][Ss][Ss][Aa][Nn][Tt]{div}|[Cc][Rr][Oo][Ii][Ss]{div}|
                 [Cc][Rr][Oo][Ss][Ss][Ii][Nn][Gg]{div}|[Cc][Rr][Oo][Ss][Ss]{div}|
@@ -241,7 +246,7 @@ street_type = r"""
                 [Hh][Ee][Aa][Tt][Hh]{div}|
                 [Hh][Ee][Ii][Gg][Hh][Tt][Ss]{div}|[Hh][Tt][Ss]{div}|
                 [Hh][Ii][Gg][Hh][Ll][Aa][Nn][Dd][Ss]{div}|[Hh][Gg][Hh][Ll][Dd][Sd]{div}|
-                [Hh][Ii][Gg][Gh][Ww][Aa][Yy]{div}|[Hh][Ww][Yy]{div}|
+                [Hh][Ii][Gg][Hh][Ww][Aa][Yy]{div}|[Hh][Ww][Yy]{div}|
                 [Hh][Ii][Ll][Ll]{div}|
                 [Hh][Oo][Ll][Ll][Oo][Ww]{div}|
                 [Îi][Ll][Ee]{div}|
@@ -249,6 +254,7 @@ street_type = r"""
                 [Ii][Nn][Ll][Ee][Tt]{div}|
                 [Ii][Ss][Ll][Aa][Nn][Dd]{div}|
                 [Kk][Ee][Yy]{div}|
+                [Kk][Ii][Nn][Gg][Ss][Ww][Aa][Yy]{div}|
                 [Kk][Nn][Oo][Ll][Ll]{div}|
                 [Ll][Aa][Nn][Dd][Ii][Nn][Gg]{div}|[Ll][Aa][Nn][Dd][Nn][Gg]{div}|
                 [Ll][Aa][Nn][Ee]{div}|
@@ -446,7 +452,7 @@ station = r"""
                         (?:[Ss][Uu][Cc][Cc][Uu][Rr][Ss][Aa][Ll][Ee])
                         (?:[Ss][Uu][Cc][Cc]\.?)|
                     )
-                    \ [\“\'\"]?.{0,13}[\”\'\"]?
+                    \ [\“\'\"]?.{0,15}[\”\'\"]?
                 )
 """
 
@@ -457,22 +463,29 @@ street_number_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_number)
 street_name_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_name)
 street_type_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_type)
 
+street_number_c = re.sub('<([a-z\_]+)>', r'<\1_c>', street_number)
+street_name_c = re.sub('<([a-z\_]+)>', r'<\1_c>', street_name)
+
 floor_b = re.sub('<([a-z\_]+)>', r'<\1_b>', floor)
 floor_c = re.sub('<([a-z\_]+)>', r'<\1_c>', floor)
 floor_d = re.sub('<([a-z\_]+)>', r'<\1_d>', floor)
 floor_e = re.sub('<([a-z\_]+)>', r'<\1_e>', floor)
 floor_f = re.sub('<([a-z\_]+)>', r'<\1_f>', floor)
+floor_g = re.sub('<([a-z\_]+)>', r'<\1_g>', floor)
+floor_h = re.sub('<([a-z\_]+)>', r'<\1_h>', floor)
 
 po_box_b = re.sub('<([a-z\_]+)>', r'<\1_b>', po_box)
 po_box_c = re.sub('<([a-z\_]+)>', r'<\1_c>', po_box)
 po_box_d = re.sub('<([a-z\_]+)>', r'<\1_d>', po_box)
+po_box_e = re.sub('<([a-z\_]+)>', r'<\1_e>', po_box)
 
 station_b = re.sub('<([a-z\_]+)>', r'<\1_b>', station)
 station_c = re.sub('<([a-z\_]+)>', r'<\1_c>', station)
 station_d = re.sub('<([a-z\_]+)>', r'<\1_d>', station)
-
+station_e = re.sub('<([a-z\_]+)>', r'<\1_e>', station)
 
 post_direction_b = re.sub('<([a-z\_]+)>', r'<\1_b>', post_direction)
+post_direction_c = re.sub('<([a-z\_]+)>', r'<\1_c>', post_direction)
 
 po_box_positive_lookahead = r"""
             (?=
@@ -495,6 +508,40 @@ po_box_positive_lookahead = r"""
             )
         """
 
+full_street_no_street_type = r"""
+    (?P<full_street_c>
+        (?:
+            {floor_g}?\,?\ ?
+            {street_number_c}\,?\ ?
+            {street_name_c}?\,?\ ?
+            {post_direction_c}?\,?\ ?
+            {floor_h}?\,?\ ?
+
+            (?P<building_id_b>
+                {building}
+            )?\,?\ ?
+
+            (?P<occupancy_b>
+                {occupancy}
+            )?\,?\ ?
+
+            {po_box_e}?
+            {station_e}?\,?\ ?
+        )
+    )
+""".format(
+    floor_g=floor_g,
+    floor_h=floor_h,
+    street_number_c=street_number_c,
+    street_name_c=street_name_c,
+    post_direction_c=post_direction_c,
+    building=building,
+    occupancy=occupancy,
+    po_box_e=po_box_e,
+    station_e=station_e,
+
+)
+
 full_street = r"""
     (?:
         # Format commonly used in French
@@ -508,7 +555,7 @@ full_street = r"""
             (?:
                 {floor_e}?\,?\ ?
                 {street_number_b}{div}
-                (?:{street_type_b}{div})?
+                {street_type_b}{div}
                 ({street_name_b} {po_box_positive_lookahead})?\,?\ ?
                 {post_direction_b}?\,?\ ?
                 {floor_d}?\,?\ ?
@@ -529,7 +576,7 @@ full_street = r"""
                 {floor_b}?\,?\ ?
                 {street_number}\,?\ ?
                 {street_name}?\,?\ ?
-                (?:(?:(?<=[\ \,]){street_type}){div})?
+                (?:(?<=[\ \,\-]){street_type}){div}
                 {post_direction}?\,?\ ?
                 {floor}?\,?\ ?
 
@@ -585,77 +632,81 @@ full_street = r"""
 # province here is actually a "province"
 province = r"""
         (?P<province>
+            \(?
             (?:
-                # provinces full (English)
-                [Aa][Ll][Bb][Ee][Rr][Tt][Aa]|
-                [Bb][Rr][Ii][Tt][Ii][Ss][Hh]\ [Cc][Oo][Ll][Uu][Mm][Bb][Ii][Aa]|
-                [Mm][Aa][Nn][Ii][Tt][Oo][Bb][Aa]|
-                [Nn][Ee][Ww]\ [Bb][Rr][Uu][Nn][Ss][Ww][Ii][Cc][Kk]|
-                [Nn][Ee][Ww][Ff][Oo][Uu][Nn][Dd][Ll][Aa][Nn][Dd]\ 
-                [Aa][Nn][Dd]\ [Ll][Aa][Bb][Rr][Aa][Dd][Oo][Rr]|
-                [Nn][Ee][Ww][Ff][Oo][Uu][Nn][Dd][Ll][Aa][Nn][Dd]\ 
-                \&\ [Ll][Aa][Bb][Rr][Aa][Dd][Oo][Rr]|
-                [Nn][Oo][Rr][Tt][Hh][Ww][Ee][Ss][Tt]\ 
-                [Tt][Ee][Rr][Rr][Ii][Tt][Oo][Rr][Ii][Ee][Ss]|
-                [Nn][Oo][Vv][Aa]\ [Ss][Cc][Oo][Tt][Ii][Aa]|
-                [Nn][Uu][Nn][Aa][Vv][Uu][Tt]|
-                [Oo][Nn][Tt][Aa][Rr][Ii][Oo]|
-                [Pp][Rr][Ii][Nn][Cc][Ee]\ [Ee][Dd][Ww][Aa][Rr][Dd]\ 
-                [Ii][Ss][Ll][Aa][Nn][Dd]|
-                [Qq][Uu][Ee][Bb][Ee][Cc]|
-                [Ss][Aa][Ss][Kk][Aa][Tt][Cc][Hh][Ee][Ww][Aa][Nn]|
-                [Yy][Uu][Kk][Oo][Nn]|
-                # provinces full (French)
-                [Cc][Oo][Ll][Oo][Mm][Bb][Ii][Ee]\-
-                [Bb][Rr][Ii][Tt][Aa][Nn]{1,2}[Ii][Qq][Eu][Ee]|
-                [Nn][Oo][Uu][Vv][Ee][Aa][Uu]\-[Bb][Rr][Uu][Nn][Ss][Ww][Ii][Cc][Kk]|
-                [Tt][Ee][Rr][Rr][Ee]\-[Nn][Ee][Uu][Vv][Ee]\-
-                [Ee][Tt]\-[Ll][Aa][Bb][Rr][Aa][Dd][Oo][Rr]|
-                [Tt][Ee][Rr][Rr][Ii][Tt][Oo][Ii][Rr][Ee][Ss]\ [Dd][Uu]\ 
-                [Nn][Oo][Rr][Dd]\-[Oo][Uu][Ee][Ss][Tt]|
-                [Nn][Oo][Uu][Vv][Ee][Ll][Ll][Ee]\-[ÉéEe][Cc][Oo][Ss][Ss][Ee]|
-                [ÎîIi][Ll][Ee]\-[Dd][Uu]\-[Pp][Rr][Ii][Nn][Cc][Ee]\-
-                [ÉéEe][Dd][Oo][Uu][Aa][Rr][Dd]|
-                [Qq][Uu][Éé][Bb][Ee][Cc]
-            )\b
-            |
-            (?:
-                # postal province abbreviations
-                [Aa]\.?[Bb]\.?|
-                [Bb]\.?[Cc]\.?|
-                [Mm]\.?[Bb]\.?|
-                [Nn]\.?[Bb]\.?|
-                [Nn]\.?[Ll]\.?|
-                [Nn]\.?[Tt]\.?|
-                [Nn]\.?[Ss]\.?|
-                [Nn]\.?[Uu]\.?|
-                [Oo]\.?[Nn]\.?|
-                [Pp]\.?[Ee]\.?|
-                [Qq]\.?[Cc]\.?|
-                [Ss]\.?[Kk]\.?|
-                [Yy]\.?[Tt]\.?
-            )\b
-            |
-            (?:
-                #traditional abbreviation (English)
-                [Aa]lta\.?|
-                [Mm]an\.?|
-                [Nn]fld[\.,]{,2} [Ll]ab\.?|
-                [Nn]\.?[Ww]\.?[Tt]\.?|
-                [N]vt\.?|
-                [Oo]nt\.?|
-                [Pp]\.?[Ee]\.?[Ii]\.?|
-                [Q]ue\.?|
-                [Ss]ask\.?|
-                [Yy]uk\.?
-            )\b
+                (?:
+                    # provinces full (English)
+                    [Aa][Ll][Bb][Ee][Rr][Tt][Aa]|
+                    [Bb][Rr][Ii][Tt][Ii][Ss][Hh][\ \-][Cc][Oo][Ll][Uu][Mm][Bb][Ii][Aa]|
+                    [Mm][Aa][Nn][Ii][Tt][Oo][Bb][Aa]|
+                    [Nn][Ee][Ww][\ \-][Bb][Rr][Uu][Nn][Ss][Ww][Ii][Cc][Kk]|
+                    [Nn][Ee][Ww][Ff][Oo][Uu][Nn][Dd][Ll][Aa][Nn][Dd][\ \-]
+                    [Aa][Nn][Dd][\ \-][Ll][Aa][Bb][Rr][Aa][Dd][Oo][Rr]|
+                    [Nn][Ee][Ww][Ff][Oo][Uu][Nn][Dd][Ll][Aa][Nn][Dd]\ 
+                    \&\ [Ll][Aa][Bb][Rr][Aa][Dd][Oo][Rr]|
+                    [Nn][Oo][Rr][Tt][Hh][Ww][Ee][Ss][Tt][\ \-]
+                    [Tt][Ee][Rr][Rr][Ii][Tt][Oo][Rr][Ii][Ee][Ss]|
+                    [Nn][Oo][Vv][Aa][\ \-][Ss][Cc][Oo][Tt][Ii][Aa]|
+                    [Nn][Uu][Nn][Aa][Vv][Uu][Tt]|
+                    [Oo][Nn][Tt][Aa][Rr][Ii][Oo]|
+                    [Pp][Rr][Ii][Nn][Cc][Ee][\ \-][Ee][Dd][Ww][Aa][Rr][Dd][\ \-]
+                    [Ii][Ss][Ll][Aa][Nn][Dd]|
+                    [Qq][Uu][Ee][Bb][Ee][Cc]|
+                    [Ss][Aa][Ss][Kk][Aa][Tt][Cc][Hh][Ee][Ww][Aa][Nn]|
+                    [Yy][Uu][Kk][Oo][Nn]|
+                    # provinces full (French)
+                    [Cc][Oo][Ll][Oo][Mm][Bb][Ii][Ee]\-
+                    [Bb][Rr][Ii][Tt][Aa][Nn]{1,2}[Ii][Qq][Eu][Ee]|
+                    [Nn][Oo][Uu][Vv][Ee][Aa][Uu]\-[Bb][Rr][Uu][Nn][Ss][Ww][Ii][Cc][Kk]|
+                    [Tt][Ee][Rr][Rr][Ee]\-[Nn][Ee][Uu][Vv][Ee]\-
+                    [Ee][Tt]\-[Ll][Aa][Bb][Rr][Aa][Dd][Oo][Rr]|
+                    [Tt][Ee][Rr][Rr][Ii][Tt][Oo][Ii][Rr][Ee][Ss]\ [Dd][Uu]\ 
+                    [Nn][Oo][Rr][Dd]\-[Oo][Uu][Ee][Ss][Tt]|
+                    [Nn][Oo][Uu][Vv][Ee][Ll][Ll][Ee]\-[ÉéEe][Cc][Oo][Ss][Ss][Ee]|
+                    [ÎîIi][Ll][Ee]\-[Dd][Uu]\-[Pp][Rr][Ii][Nn][Cc][Ee]\-
+                    [ÉéEe][Dd][Oo][Uu][Aa][Rr][Dd]|
+                    [Qq][Uu][Éé][Bb][Ee][Cc]
+                )
+                |
+                (?:
+                    # postal province abbreviations
+                    [Aa]\.?[Bb]\.?|
+                    [Bb]\.?[Cc]|
+                    [Mm]\.?[Bb]|
+                    [Nn]\.?[Bb]|
+                    [Nn]\.?[Ll]|
+                    [Nn]\.?[Tt]|
+                    [Nn]\.?[Ss]|
+                    [Nn]\.?[Uu]|
+                    [Oo]\.?[Nn]|
+                    [Pp]\.?[Ee]|
+                    [Qq]\.?[Cc]|
+                    [Ss]\.?[Kk]|
+                    [Yy]\.?[Tt]
+                )
+                |
+                (?:
+                    #traditional abbreviation (English)
+                    [Aa]lta|
+                    [Mm]an|
+                    [Nn]fld[\.,]{,2} [Ll]ab|
+                    [Nn]\.?[Ww]\.?[Tt]|
+                    [N]vt|
+                    [Oo]nt|
+                    [Pp]\.?[Ee]\.?[Ii]|
+                    [Q]ue|
+                    [Ss]ask|
+                    [Yy]uk
+                )
+            )
+            \.?[\)\ ,]{1,2}
         )
         """
 
 city = r"""
         (?P<city>
             (?<=[\, ])[A-z]{1}(?![0-9]) # city second char should not be number
-            [\w\ \-\'\.]{2,20}?(?=[\, ])
+            [\w\ \-\'\.]{2,25}?(?=[\, ])
         )
         """
 
@@ -670,47 +721,38 @@ postal_code = r"""
 
 country = r"""
             (?:
-                [Cc][Aa](?:[Nn][Aa][Dd][Aa])?
+                \ ?[Cc][Aa](?:[Nn][Aa][Dd][Aa])?
             )
             """
 
 # define detection rules for postal code placed in different parts of address
-postal_code_y1 = re.sub('<([a-z\_]+)>', r'<\1_y1>', postal_code)
-postal_code_y2 = re.sub('<([a-z\_]+)>', r'<\1_y2>', postal_code)
+postal_code_b = re.sub('<([a-z\_]+)>', r'<\1_b>', postal_code)
+postal_code_c = re.sub('<([a-z\_]+)>', r'<\1_c>', postal_code)
 
-province_x1 = re.sub('<([a-z\_]+)>', r'<\1_y1>', province)
-province_x2 = re.sub('<([a-z\_]+)>', r'<\1_y2>', province)
+province_b = re.sub('<([a-z\_]+)>', r'<\1_y1>', province)
 
 full_address = r"""
                 (?P<full_address>
-                    {full_street} {div}
+                    (?:{full_street}|{full_street_no_street_type}) {div}
                     {city} {div}
 
-                    #Either X or Y Must be True : You must have a Postcode or Province
+                    #
                     (?:
-                        #Postcode required (X expression)
-                        (?:
-                            {postal_code} (?: {div} (?:{province_x1} {div} {country}?) | (?:{country} {div} {province_x2}?) )?
-                        )
-                        |
-                        #Province required (Y expression)
-                        (?:
-                            {province} (?: {div} (?:{postal_code_y1} {div} {country}?) | (?:{country} {div} {postal_code_y2}?) )?
-                        )
+                        (?:{postal_code}|{province})(?:{div}{country})?(?(postal_code)(?:{div}{province_b})?|(?(full_street)(?:{div}{postal_code_b})?|{div}{postal_code_c}))(?:{div}{country})?
                     )
                 )
                 """.format(
     full_street=full_street,
-    div='[\ |\,|\-|\||٠∙•••●▪\\\/;]{,2}',
+    full_street_no_street_type=full_street_no_street_type,
+    div=r'[\ |\,|\-|\||٠∙•••●▪\\\/;]{0,2}',
     city=city,
 
     province=province,
-    province_x1=province_x1,
-    province_x2=province_x2,
+    province_b=province_b,
 
     country=country,
 
     postal_code=postal_code,
-    postal_code_y1=postal_code_y1,
-    postal_code_y2=postal_code_y2,
+    postal_code_b=postal_code_b,
+    postal_code_c=postal_code_c,
 )
