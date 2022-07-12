@@ -456,8 +456,9 @@ station = r"""
                 )
 """
 
-'''Define detection rules for a second type of address format
-   (the French one)
+'''
+Duplicate detection rules for different positional matches and mixed
+requirement rules.
 '''
 street_number_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_number)
 street_name_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_name)
@@ -629,7 +630,6 @@ full_street = r"""
                 div='[\ |\,|\-|\||٠∙•••●▪\\\/;]{1,2}',
                 )
 
-# province here is actually a "province"
 province = r"""
         (?P<province>
             \(?
@@ -725,7 +725,7 @@ country = r"""
             )
             """
 
-# define detection rules for postal code placed in different parts of address
+# define detection rules for postal code & province placed in different parts of address
 postal_code_b = re.sub('<([a-z\_]+)>', r'<\1_b>', postal_code)
 postal_code_c = re.sub('<([a-z\_]+)>', r'<\1_c>', postal_code)
 
