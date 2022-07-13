@@ -15,6 +15,7 @@
 """
 
 import string
+import re
 
 
 '''Numerals from one to nine
@@ -270,7 +271,7 @@ street_type_list = [
     'Opas', 'Orch', 'Orchard', 'Orchrd', 'Oval', 'Overpass',
     'Ovl', 'Park', 'Parks', 'Parkway', 'Parkways', 'Parkwy',
     'Pass', 'Passage', 'Path', 'Paths', 'Pike', 'Pikes',
-    'Pine', 'Pines','Parkway', 'Pkway', 'Pkwy', 'Pkwys', 'Pky',
+    'Pine', 'Pines', 'Parkway', 'Pkway', 'Pkwy', 'Pkwys', 'Pky',
     'Pl', 'Place', 'Plain', 'Plains', 'Plaza', 'Pln',
     'Plns', 'Plz', 'Plza', 'Pne', 'Pnes', 'Point',
     'Points', 'Port', 'Ports', 'Pr', 'Prairie', 'Prk',
@@ -449,30 +450,63 @@ dorm = r"""
         )
     )""".format(occupancy=occupancy)
 
+'''
+Duplicate detection rules for different positional matches and mixed
+requirement rules.
+'''
+street_number_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_number)
+street_name_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_name)
+post_direction_b = re.sub('<([a-z\_]+)>', r'<\1_b>', post_direction)
+floor_b = re.sub('<([a-z\_]+)>', r'<\1_b>', floor)
+building_b = re.sub('<([a-z\_]+)>', r'<\1_b>', building)
+occupancy_b = re.sub('<([a-z\_]+)>', r'<\1_b>', occupancy)
+dorm_b = re.sub('<([a-z\_]+)>', r'<\1_b>', dorm)
+
+full_street_no_street_type = r"""
+    (?P<full_street_b>
+        (?:
+            {dorm_b}?\,?\ ?
+            {street_number_b}\s{{0,6}}
+            {street_name_b}?\,?\ ?
+            {post_direction_b}?\,?\ ?
+            {floor_b}?\,?\ ?
+            {building_b}?\,?\ ?
+            {occupancy_b}?\,?\ ?
+            {po_box}?
+        )
+    )
+""".format(dorm_b=dorm_b,
+           street_number_b=street_number_b,
+           street_name_b=street_name_b,
+           post_direction_b=post_direction_b,
+           floor_b=floor_b,
+           building_b=building_b,
+           occupancy_b=occupancy_b,
+           po_box=po_box,
+           )
+
 full_street = r"""
-    (?:
-        (?P<full_street>
+    (?P<full_street>
+        (?:
+            {po_box}
+        )
+        |
+        (?:
+            {dorm}?\,?\ ?
+            {street_number}\s{{0,6}}
             (?:
-                {po_box}
-            )
-            |
-            (?:
-                {dorm}?\,?\ ?
-                {street_number}\s{{0,6}}
+                (?:{special_streets}\,?\ ?)
+                |
                 (?:
-                    (?:{special_streets}\,?\ ?)
-                    |
-                    (?:
-                        {street_name}?\,?\ ?
-                        (?:[\ \,]{street_type})\,?\ ?
-                    )
+                    {street_name}?\,?\ ?
+                    (?:[\ \,]{street_type})\,?\ ?
                 )
-                {post_direction}?\,?\ ?
-                {floor}?\,?\ ?
-                {building}?\,?\ ?
-                {occupancy}?\,?\ ?
-                {po_box}?
             )
+            {post_direction}?\,?\ ?
+            {floor}?\,?\ ?
+            {building}?\,?\ ?
+            {occupancy}?\,?\ ?
+            {po_box}?
         )
     )""".format(dorm=dorm,
                 street_number=street_number,
@@ -488,8 +522,8 @@ full_street = r"""
                 )
 
 # region1 is actually a "state"
-region1 = r"""
-        (?P<region1>
+region = r"""
+        (?P<region>
             \b(?:
                 #State Abbreviations
                 [Aa]\.?(?:[Ll]|[Kk]|[Zz]|[Rr])|
@@ -607,21 +641,29 @@ country = r"""
             )
             """
 
+postal_code_b = re.sub('<([a-z\_]+)>', r'<\1_b>', postal_code)
+postal_code_c = re.sub('<([a-z\_]+)>', r'<\1_c>', postal_code)
+
+region_b = re.sub('<([a-z\_]+)>', r'<\1__b>', region)
+
 full_address = r"""
                 (?P<full_address>
-                    {full_street}
+                    (?:{full_street}|{full_street_no_street_type}) {div}?
+                    {city} {div}?
+
                     (?:
-                        (?:{div} {city})?
-                        (?:{div} {region1})?
-                        (?:{div} {postal_code})?
-                        (?:{div} {country})?
+                        (?:{postal_code}|{region})(?:{div}{country})?(?(postal_code)(?:{div}{region_b})?|(?(full_street)(?:{div}{postal_code_b})?|{div}{postal_code_c}))(?:{div}{country})?
                     )
                 )
                 """.format(
     full_street=full_street,
+    full_street_no_street_type=full_street_no_street_type,
     div=common_div,
     city=city,
-    region1=region1,
+    region=region,
+    region_b=region_b,
     country=country,
     postal_code=postal_code,
+    postal_code_b=postal_code_b,
+    postal_code_c=postal_code_c,
 )
