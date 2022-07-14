@@ -645,6 +645,7 @@ postal_code_b = re.sub('<([a-z\_]+)>', r'<\1_b>', postal_code)
 postal_code_c = re.sub('<([a-z\_]+)>', r'<\1_c>', postal_code)
 
 region_b = re.sub('<([a-z\_]+)>', r'<\1__b>', region)
+region_c = re.sub('<([a-z\_]+)>', r'<\1__c>', region)
 
 full_address = r"""
                 (?P<full_address>
@@ -652,7 +653,7 @@ full_address = r"""
                     {city} {div}?
 
                     (?:
-                        (?:{postal_code}|{region})(?:{div}{country})?(?(postal_code)(?:{div}{region_b})?|(?(full_street)(?:{div}{postal_code_b})?|{div}{postal_code_c}))(?:{div}{country})?
+                        (?:{postal_code}|{region})(?:{div}{country})?(?(postal_code)(?(full_street)(?:{div}{region_b})?|(?:{div}{region_c}))|(?(full_street)(?:{div}{postal_code_b})?|{div}{postal_code_c}))(?:{div}{country})?
                     )
                 )
                 """.format(
@@ -662,6 +663,7 @@ full_address = r"""
     city=city,
     region=region,
     region_b=region_b,
+    region_c=region_c,
     country=country,
     postal_code=postal_code,
     postal_code_b=postal_code_b,
