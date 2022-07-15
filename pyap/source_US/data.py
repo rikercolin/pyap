@@ -24,8 +24,8 @@ instead of '(one)(?i)' to match 'One' or 'oNe' because
 Python Regexps don't seem to support turning On/Off
 case modes for subcapturing groups.
 '''
-common_div = r'[\ |\,|\-|\||٠∙•••●▪\\\/;]{0,3}'
-restrictive_div = r'[\.\ \,]{0,3}'
+common_div = '[\ |\,|\-|\||٠∙•••●▪\\\/;]{0,4}'
+restrictive_div = '[\.\ \,\n]{1,4}'
 
 zero_to_nine = r"""(?:
     [Zz][Ee][Rr][Oo]|[Oo][Nn][Ee]|[Tt][Ww][Oo]|
@@ -42,7 +42,7 @@ zero_to_nine = r"""(?:
     [Ss][Ee][Vv][Ee][Nn][Tt][Ee][Ee][Nn]|
     [Ee][Ii][Gg][Hh][Tt][Ee][Ee][Nn]|
     [Nn][Ii][Nn][Ee][Tt][Ee][Ee][Nn]
-    )\ """
+    )"""
 
 # Numerals - 10, 20, 30 ... 90
 ten_to_ninety = r"""(?:
@@ -65,17 +65,18 @@ hundred = r"""(?:
 thousand = r"""(?:
     [Tt][Hh][Oo][Uu][Ss][Aa][Nn][Dd]\ 
     )"""
-div = r"""[\ ,\-]{0,2} """
+
+
 post_number_directions = r"""
                             (?:
-                                (?:\d[\ ,\-]{0,2}N|N\d) |
-                                (?:\d[\ ,\-]{0,2}S|S\d) |
-                                (?:\d[\ ,\-]{0,2}E|E\d) |
-                                (?:\d[\ ,\-]{0,2}W|W\d) |
+                                (?:\d[\ ,\-]{0,2}N\b|N\d) |
+                                (?:\d[\ ,\-]{0,2}S\b|S\d) |
+                                (?:\d[\ ,\-]{0,2}E\b|E\d) |
+                                (?:\d[\ ,\-]{0,2}W\b|W\d) |
 
-                                (?:\d[\ ,\-]{0,2}P|P\d) |
-                                (?:\d[\ ,\-]{0,2}D|D\d) |
-                                (?:\d[\ ,\-]{0,2}A|A\d)
+                                (?:\d[\ ,\-]{0,2}P\b|P\d) |
+                                (?:\d[\ ,\-]{0,2}D\b|D\d) |
+                                (?:\d[\ ,\-]{0,2}A\b|A\d)
                             )
 """
 
@@ -121,6 +122,8 @@ street_number_follow_exclusions = r"""
                                     (?:(?<=[12][90]\d{2}\D{3})\d(?:[Ss]t|[Nn]d|[Rr]d|[Tt]h)\ [Pp]lace)|
                                     (?:(?<=\b3-[Dd]\s)[Pp]rint(?:e[rd])?)|
                                     (?:(?<=\b[Ss]ix\s)[Ss]igma)|
+                                    (?:(?<=Page\s\d))|
+                                    (?:(?<=Page\s\d\d))|
 
                                     [Bb]asis|
                                     [Cc]ommunications|
@@ -131,7 +134,8 @@ street_number_follow_exclusions = r"""
                                     [Ff]ax|
                                     [Gg]rade\ [Pp]oint\ [Aa]verage|
                                     [Vv]olunteering|
-                                    [Ww]all\ [Ss]treet\ [Jj]ournal
+                                    [Ww]all\ [Ss]treet\ [Jj]ournal|
+                                    [Pp]lace
                                 )\b
                             """
 
@@ -159,7 +163,6 @@ street_number = r"""(?P<street_number>
                         |
                         (?:
                             (?:\d|{post_number_directions}){from_to}
-                            (?:\ ?\-?\ ?\d{from_to})?\ 
                         )
                     )
                     (?!
@@ -180,9 +183,7 @@ In example below:
 "Hoover Boulevard": "Hoover" is a street name
 '''
 street_name = r"""(?P<street_name>
-                        (?:[a-zA-Z0-9\ \.\-]{3,31})
-                    |
-                        (?:\b[A-Za-z]\b(?=.{4,50}\bDC\b))
+                        (?:[a-zA-Z0-9][a-zA-Z0-9\ \.\-\n]{0,30})
                     )
               """
 
@@ -432,15 +433,32 @@ occupancy = r"""
                     (?:
                         \#?[0-9]{,3}[A-Za-z]{1}
                     )
+                    |
+                    (?:
+                        \#?\b[0-9]{1,3}[A-Za-z]?\b
+                    )
                 )\ ?
             )
             """
 
 po_box = r"""
             (?:
-                (?:[Pp](?:ost)?\.?\ ?[Oo](?:ffice)?\.?)?.{,3}[Bb][Oo][Xx]\ \d+
+                \b(?:
+                    # English - PO Box 123
+                    (?:[Pp][\ \.\n]{0,3}[Oo][\ \.\n]{1,3}[Bb][Oo][Xx][\ \n]{1,3}\d+)
+                    |
+                    (?:[Bb][Oo][Xx][\ \n]{1,3}\d+)
+                )
             )
         """
+
+dept_no = r"""
+    (?:
+        (?:[Dd][Ee][Pp][Tt][\.\,\ #]{1,3}\d{1,3})
+        |
+        (?:[Dd][Ee][Pp][Aa][Rr][Tt][Mm][Ee][Nn][Tt][\ \n][Nn][Oo][\.\ ]{1,2}\d{1,3})
+    )
+"""
 
 dorm = r"""
     (?P<dorm>
@@ -465,14 +483,14 @@ dorm_b = re.sub('<([a-z\_]+)>', r'<\1_b>', dorm)
 full_street_no_street_type = r"""
     (?P<full_street_b>
         (?:
-            {dorm_b}?\,?\ ?
-            {street_number_b}\s{{0,6}}
-            {street_name_b}?\,?\ ?
-            {post_direction_b}?\,?\ ?
-            {floor_b}?\,?\ ?
-            {building_b}?\,?\ ?
-            {occupancy_b}?\,?\ ?
-            {po_box}?
+            (?:{dorm_b}{div})?
+            {street_number_b}{div}
+            {street_name_b}{div}?
+            (?:{post_direction_b}{div})?
+            (?:{floor_b}{div})?
+            (?:{building_b}{div})?
+            (?:{occupancy_b}{div})?
+            (?:{po_box}{div})?
         )
     )
 """.format(dorm_b=dorm_b,
@@ -483,30 +501,34 @@ full_street_no_street_type = r"""
            building_b=building_b,
            occupancy_b=occupancy_b,
            po_box=po_box,
+           div=restrictive_div
            )
 
 full_street = r"""
     (?P<full_street>
         (?:
-            {po_box}
+            {po_box}{div}?
+            (?:{occupancy}{div})?
+            (?:{dept_no}{div})?
         )
         |
         (?:
-            {dorm}?\,?\ ?
-            {street_number}\s{{0,6}}
+            (?:{dorm}{div})?
+            {street_number}{div}
             (?:
-                (?:{special_streets}\,?\ ?)
+                (?:{special_streets}{div}?)
                 |
                 (?:
-                    {street_name}?\,?\ ?
-                    (?:[\ \,]{street_type})\,?\ ?
+                    {street_name}{div}
+                    {street_type}{div}?
                 )
             )
-            {post_direction}?\,?\ ?
-            {floor}?\,?\ ?
-            {building}?\,?\ ?
-            {occupancy}?\,?\ ?
-            {po_box}?
+            (?:{post_direction}{div})?
+            (?:{floor}{div})?
+            (?:{building}{div})?
+            (?:{occupancy}{div})?
+            (?:{po_box}{div})?
+            (?:{dept_no}{div})?
         )
     )""".format(dorm=dorm,
                 street_number=street_number,
@@ -515,6 +537,7 @@ full_street = r"""
                 post_direction=post_direction,
                 floor=floor,
                 building=building,
+                dept_no=dept_no,
                 occupancy=occupancy,
                 po_box=po_box,
                 div=restrictive_div,
@@ -624,7 +647,7 @@ region = r"""
 # TODO: doesn't catch cities containing French characters
 city = r"""
         (?P<city>
-            [A-Za-z]{1}[a-zA-Z\ \-\'\.]{2,20}
+            \b[A-Za-z]{1}[a-zA-Z\ \-\'\.]{2,20}
         )
         """
 

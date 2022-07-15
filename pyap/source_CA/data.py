@@ -427,16 +427,16 @@ po_box = r"""
             (?P<postal_box>
                 \b(?:
                     # English - PO Box 123
-                    (?:[Pp][\ \.]{0,2}[Oo][\ \.]{0,2}[Bb][Oo][Xx]\ \d+)
+                    (?:[Pp][\ \.]{0,2}[Oo][\ \.]{0,2}[Bb][Oo][Xx][\ \n]\d+)
                     |
                     # French - B.P. 123
-                    (?:[Bb][\ \.]{0,2}[Pp][\ \.]{0,2}\d+)
+                    (?:[Bb][\ \.]{0,2}[Pp][\ \.\n]{0,2}\d+)
                     |
                     # C.P. 123 CP123 CP 123 C.P123 C.P.123 etc
-                    (?:[Cc][\ \.]{0,2}[Pp][\ \.]{0,2}\d+)
+                    (?:[Cc][\ \.]{0,2}[Pp][\ \.\n]{0,2}\d+)
                     |
                     # Case postale 123
-                    (?:[Cc]ase\ [Pp][Oo][Ss][Tt][Aa][Ll][Ee]\ \d+)
+                    (?:[Cc]ase\ [Pp][Oo][Ss][Tt][Aa][Ll][Ee][\ \n]\d+)
                 )
             )
         """
@@ -627,7 +627,7 @@ full_street = r"""
 
                 po_box_positive_lookahead=po_box_positive_lookahead,
 
-                div='[\ |\,|\-|\||٠∙•••●▪\\\/;]{1,2}',
+                div='[\ |\,|\-|\||٠∙•••●▪\\\/;\n]{1,2}',
                 )
 
 province = r"""
@@ -744,7 +744,7 @@ full_address = r"""
                 """.format(
     full_street=full_street,
     full_street_no_street_type=full_street_no_street_type,
-    div=r'[\ |\,|\-|\||٠∙•••●▪\\\/;]{0,2}',
+    div=r'[\ |\,|\-|\||٠∙•••●▪\\\/;\n]{0,2}',
     city=city,
 
     province=province,
