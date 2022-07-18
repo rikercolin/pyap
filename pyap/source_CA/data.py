@@ -340,7 +340,7 @@ floor = r"""
                 #English
                 (?:
                     (?:
-                        (?:\d+[A-Za-z]{{0,2}}\.?\ )|
+                        (?:\d{{1,6}}[A-Za-z]{{0,2}}\.?\ )|
                         (?:{first_to_tenth})
                     )
                     [Ff][Ll](?:[Oo][Oo])?[Rr][\.,\ ;]
@@ -349,18 +349,18 @@ floor = r"""
                 (?:
                     [Ff][Ll](?:[Oo][Oo])?[Rr]\ 
                     (?:
-                        (?:\d+[A-Za-z]{{0,2}}[\.,\ ;])|
+                        (?:\d{{1,6}}[A-Za-z]{{0,2}}[\.,\ ;])|
                         (?:{zero_to_nine})
                     )
                 )
                 |
                 #French
                 (?:
-                    \d+[A-Za-z]{{0,3}}\.?\ [Éé][Tt][Aa][Gg][Ee][\.,\ ]
+                    \d{{1,6}}[A-Za-z]{{0,3}}\.?\ [Éé][Tt][Aa][Gg][Ee][\.,\ ]
                 )
                 |
                 (?:
-                    [Éé][Tt][Aa][Gg][Ee]\ \d+[A-Za-z]{{0,3}}[\.,\ ]
+                    [Éé][Tt][Aa][Gg][Ee]\ \d{{1,6}}[A-Za-z]{{0,3}}[\.,\ ]
                 )
             )
         """.format(first_to_tenth=first_to_tenth,
@@ -427,16 +427,16 @@ po_box = r"""
             (?P<postal_box>
                 \b(?:
                     # English - PO Box 123
-                    (?:[Pp][\ \.]{0,2}[Oo][\ \.]{0,2}[Bb][Oo][Xx][\ \n]\d+)
+                    (?:[Pp][\ \.]{0,2}[Oo][\ \.]{0,2}[Bb][Oo][Xx][\ \n]\d{1,6})
                     |
                     # French - B.P. 123
-                    (?:[Bb][\ \.]{0,2}[Pp][\ \.\n]{0,2}\d+)
+                    (?:[Bb][\ \.]{0,2}[Pp][\ \.\n]{0,2}\d{1,6})
                     |
                     # C.P. 123 CP123 CP 123 C.P123 C.P.123 etc
-                    (?:[Cc][\ \.]{0,2}[Pp][\ \.\n]{0,2}\d+)
+                    (?:[Cc][\ \.]{0,2}[Pp][\ \.\n]{0,2}\d{1,6})
                     |
                     # Case postale 123
-                    (?:[Cc]ase\ [Pp][Oo][Ss][Tt][Aa][Ll][Ee][\ \n]\d+)
+                    (?:[Cc]ase\ [Pp][Oo][Ss][Tt][Aa][Ll][Ee][\ \n]\d{1,6})
                 )
             )
         """
@@ -449,8 +449,8 @@ station = r"""
                         (?:[Ss][Tt][Aa][Tt][Ii][Oo][Nn])|
                         (?:[Ss][Tt][Nn]\.?)|
                         #French
-                        (?:[Ss][Uu][Cc][Cc][Uu][Rr][Ss][Aa][Ll][Ee])
-                        (?:[Ss][Uu][Cc][Cc]\.?)|
+                        (?:[Ss][Uu][Cc][Cc][Uu][Rr][Ss][Aa][Ll][Ee])|
+                        (?:[Ss][Uu][Cc][Cc]\.?)
                     )
                     \ [\“\'\"]?.{0,15}[\”\'\"]?
                 )
@@ -463,6 +463,7 @@ requirement rules.
 street_number_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_number)
 street_name_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_name)
 street_type_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_type)
+street_type_c = re.sub('<([a-z\_]+)>', r'<\1_c>', street_type)
 
 street_number_c = re.sub('<([a-z\_]+)>', r'<\1_c>', street_number)
 street_name_c = re.sub('<([a-z\_]+)>', r'<\1_c>', street_name)
@@ -514,7 +515,7 @@ full_street_no_street_type = r"""
         (?:
             {floor_g}?\,?\ ?
             {street_number_c}\,?\ ?
-            {street_name_c}?\,?\ ?
+            {street_name_c}\,?\ ?
             {post_direction_c}?\,?\ ?
             {floor_h}?\,?\ ?
 
@@ -535,6 +536,7 @@ full_street_no_street_type = r"""
     floor_h=floor_h,
     street_number_c=street_number_c,
     street_name_c=street_name_c,
+    street_type_c=street_type_c,
     post_direction_c=post_direction_c,
     building=building,
     occupancy=occupancy,
@@ -544,9 +546,9 @@ full_street_no_street_type = r"""
 )
 
 full_street = r"""
-    (?:
+    (?P<full_street>
         # Format commonly used in French
-        (?P<full_street_b>
+        (?:
             (?:
                 {floor_f}?\,?\ ?
                 {po_box_d}\,?\ ?
@@ -555,18 +557,27 @@ full_street = r"""
             |
             (?:
                 {floor_e}?\,?\ ?
-                {street_number_b}{div}
-                {street_type_b}{div}
+                {street_number_b}\,?\ ?
+                {street_type_b}\,?\ ?
                 ({street_name_b} {po_box_positive_lookahead})?\,?\ ?
                 {post_direction_b}?\,?\ ?
                 {floor_d}?\,?\ ?
+
+                (?P<building_id_c>
+                    {building}
+                )?\,?\ ?
+
+                (?P<occupancy_c>
+                    {occupancy}
+                )?\,?\ ?
+
                 {po_box_b}?\,?\ ?
                 {station_b}?\,?\ ?
             )
         )
         |
         # Format commonly used in English
-        (?P<full_street>
+        (?:
             (?:
                 {floor_c}?\,?\ ?
                 {po_box_c}\,?\ ?
@@ -699,7 +710,7 @@ province = r"""
                     [Yy]uk
                 )
             )
-            \.?[\)\ ,]{1,2}
+            \.?(?:[\)\ ,]{1,2}|$)
         )
         """
 

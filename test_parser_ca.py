@@ -150,9 +150,10 @@ def test_street_number_negative(input, expected):
     ("eASt ", True),
     ("NW ", True),
     ("SE ", True),
+    ("NW.", True),
+    ("NW. ", True),
+    ("N.O.", True),
     # negative assertions
-    ("NW.", False),
-    ("NW. ", False),
     ("NS ", False),
     ("EW ", False),
 ])
@@ -333,8 +334,7 @@ still finding correct matches in full_address
 @pytest.mark.parametrize("input,expected", [
     # positive assertions
     ("15979 Bow Bottom Trail SE, Calgary, AB T2J 6T5", True),
-    ("1730 McPherson Crt. Unit 35, Pickering, ON",
-        True),
+    ("1730 McPherson Crt. Unit 35, Pickering, ON", True),
     ("20 Fleeceline Road, Toronto, Ontario M8V 2K3", True),
     ("7034 Gilliespie Lane, Mississauga, ON L5W1E8", True),
     ("12991 Keele Street King City, Ontario L7B 1G2 CANADA", True),
@@ -439,17 +439,17 @@ def test_postal_code_negative(input, expected):
 
 @pytest.mark.parametrize("input,expected", [
     # positive assertions
-    ("Quebec", True),
-    ("Nova Scotia", True),
-    ("Colombie-Britannique", True),
-    ("New Brunswick", True),
-    ("Quebec", True),
-    ("Québec", True),
-    ("Territoires Du Nord-Ouest", True),
+    ("Quebec ", True),
+    ("Nova Scotia ", True),
+    ("Colombie-Britannique ", True),
+    ("New Brunswick ", True),
+    ("Quebec ", True),
+    ("Québec ", True),
+    ("Territoires Du Nord-Ouest ", True),
 ])
-def test_region1(input, expected):
+def test_province(input, expected):
     ''' test exact string match for province '''
-    match = utils.match(data_ca.region1, input, re.VERBOSE)
+    match = utils.match(data_ca.province, input, re.VERBOSE)
     is_found = match is not None
     assert is_found == expected and \
         match.group(0) == utils.unicode_str(input)
