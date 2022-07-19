@@ -9,6 +9,7 @@
 """
 
 import string
+import re
 
 '''Numerals from one to nine
 Note: here and below we use syntax like '[Oo][Nn][Ee]'
@@ -20,42 +21,42 @@ common_div = '[\ |\,|\-|\||٠∙•••●▪\\\/;]{0,4}'
 restrictive_div = '[\.\ \,\n]{1,4}'
 
 zero_to_nine = r"""(?:
-    [Zz][Ee][Rr][Oo]|[Oo][Nn][Ee]|[Tt][Ww][Oo]|
-    [Tt][Hh][Rr][Ee][Ee]|[Ff][Oo][Uu][Rr]|
-    [Ff][Ii][Vv][Ee]|[Ss][Ii][Xx]|
-    [Ss][Ee][Vv][Ee][Nn]|[Ee][Ii][Gg][Hh][Tt]|
-    [Nn][Ii][Nn][Ee]|[Tt][Ee][Nn]|
-    [Ee][Ll][Ee][Vv][Ee][Nn]|
-    [Tt][Ww][Ee][Ll][Vv][Ee]|
-    [Tt][Hh][Ii][Rr][Tt][Ee][Ee][Nn]|
-    [Ff][Oo][Uu][Rr][Tt][Ee][Ee][Nn]|
-    [Ff][Ii][Ff][Tt][Ee][Ee][Nn]|
-    [Ss][Ii][Xx][Tt][Ee][Ee][Nn]|
-    [Ss][Ee][Vv][Ee][Nn][Tt][Ee][Ee][Nn]|
-    [Ee][Ii][Gg][Hh][Tt][Ee][Ee][Nn]|
-    [Nn][Ii][Nn][Ee][Tt][Ee][Ee][Nn]
+    [Zz][Ee][Rr][Oo]\ ?|[Oo][Nn][Ee]\ ?|[Tt][Ww][Oo]\ ?|
+    [Tt][Hh][Rr][Ee][Ee]\ ?|[Ff][Oo][Uu][Rr]\ ?|
+    [Ff][Ii][Vv][Ee]\ ?|[Ss][Ii][Xx]\ ?|
+    [Ss][Ee][Vv][Ee][Nn]\ ?|[Ee][Ii][Gg][Hh][Tt]\ ?|
+    [Nn][Ii][Nn][Ee]\ ?|[Tt][Ee][Nn]\ ?|
+    [Ee][Ll][Ee][Vv][Ee][Nn]\ ?|
+    [Tt][Ww][Ee][Ll][Vv][Ee]\ ?|
+    [Tt][Hh][Ii][Rr][Tt][Ee][Ee][Nn]\ ?|
+    [Ff][Oo][Uu][Rr][Tt][Ee][Ee][Nn]\ ?|
+    [Ff][Ii][Ff][Tt][Ee][Ee][Nn]\ ?|
+    [Ss][Ii][Xx][Tt][Ee][Ee][Nn]\ ?|
+    [Ss][Ee][Vv][Ee][Nn][Tt][Ee][Ee][Nn]\ ?|
+    [Ee][Ii][Gg][Hh][Tt][Ee][Ee][Nn]\ ?|
+    [Nn][Ii][Nn][Ee][Tt][Ee][Ee][Nn]\ ?
     )"""
 
 # Numerals - 10, 20, 30 ... 90
 ten_to_ninety = r"""(?:
-    [Tt][Ee][Nn]\ |[Tt][Ww][Ee][Nn][Tt][Yy]\ |
-    [Tt][Hh][Ii][Rr][Tt][Yy]\ |
-    [Ff][Oo][Rr][Tt][Yy]\ |
-    [Ff][Oo][Uu][Rr][Tt][Yy]\ |
-    [Ff][Ii][Ff][Tt][Yy]\ |[Ss][Ii][Xx][Tt][Yy]\ |
-    [Ss][Ee][Vv][Ee][Nn][Tt][Yy]\ |
-    [Ee][Ii][Gg][Hh][Tt][Yy]\ |
-    [Nn][Ii][Nn][Ee][Tt][Yy]\ 
+    [Tt][Ee][Nn]\ ?|[Tt][Ww][Ee][Nn][Tt][Yy]\ ?|
+    [Tt][Hh][Ii][Rr][Tt][Yy]\ ?|
+    [Ff][Oo][Rr][Tt][Yy]\ ?|
+    [Ff][Oo][Uu][Rr][Tt][Yy]\ ?|
+    [Ff][Ii][Ff][Tt][Yy]\ |[Ss][Ii][Xx][Tt][Yy]\ ?|
+    [Ss][Ee][Vv][Ee][Nn][Tt][Yy]\ ?|
+    [Ee][Ii][Gg][Hh][Tt][Yy]\ ?|
+    [Nn][Ii][Nn][Ee][Tt][Yy]\ ?
     )"""
 
 # One hundred
 hundred = r"""(?:
-    [Hh][Uu][Nn][Dd][Rr][Ee][Dd]\ 
+    [Hh][Uu][Nn][Dd][Rr][Ee][Dd]\ ?
     )"""
 
 # One thousand
 thousand = r"""(?:
-    [Tt][Hh][Oo][Uu][Ss][Aa][Nn][Dd]\ 
+    [Tt][Hh][Oo][Uu][Ss][Aa][Nn][Dd]\ ?
     )"""
 
 
@@ -105,7 +106,7 @@ street_number = r"""(?P<street_number>
                         ){{0,4}}\,?
                         |
                         (?:
-                            (?:\d|{post_number_directions}){from_to}
+                            (?:\-|\d|{post_number_directions}){from_to}
                         )
                     )
                 """.format(thousand=thousand,
@@ -113,7 +114,7 @@ street_number = r"""(?P<street_number>
                            zero_to_nine=zero_to_nine,
                            ten_to_ninety=ten_to_ninety,
                            post_number_directions=post_number_directions,
-                           from_to='{1,5}')
+                           from_to='{1,7}')
 
 '''
 Regexp for matching street name.
@@ -128,22 +129,45 @@ street_name = r"""(?P<street_name>
 post_direction = r"""
                     (?P<post_direction>
                         (?:
+                            #English
                             [Nn][Oo][Rr][Tt][Hh]\ |
                             [Ss][Oo][Uu][Tt][Hh]\ |
                             [Ee][Aa][Ss][Tt]\ |
-                            [Ww][Ee][Ss][Tt]\ 
+                            [Ww][Ee][Ss][Tt]\ |
+
+                            #French
+                            [Ee][Ss][Tt]\ |
+                            [Nn][Oo][Rr][Dd]\ |
+                            [Ss][Uu][Dd]\ |
+                            [Oo][Uu][Ee][Ss][Tt]\ 
                         )
                         (?:
-                            \s?[Ee][Aa][Ss][Tt]\ |
-                            \s?[Ww][Ee][Ss][Tt]\ 
+                            [\s\-]?[Ee][Aa][Ss][Tt]\ |
+                            [\s\-]?[Ww][Ee][Ss][Tt]\ |
+                            [\s\-]?[Oo][Uu][Ee][Ss][Tt]\ |
+                            [\s\-]?[Ee][Ss][Tt]\ |
+
                         )?
                         |
                         (?:
-                            N\.?W\.?|N\.?E\.?|S\.?W\.?|S\.?E\.?
+                            N\.?W\.|
+                            N\.?E\.|
+                            S\.?W\.|
+                            S\.?E\.|
+                            N\.?O\.
+
+                        )
+                        |
+                        (?:
+                            N\.|S\.|E\.|W\.|O\.
+                        )
+                        |
+                        (?:
+                            N\.?W|N\.?E|S\.?W|S\.?E|N\.?O
                         )\b
                         |
                         (?:
-                            N\.?|S\.?|E\.?|W\.?
+                           [NSEWO]
                         )\b
                     )
                 """
@@ -159,7 +183,7 @@ street_type_list = [
     'Bnd', 'Bot', 'Bottm', 'Bottom', 'Boul', 'Boulevard',
     'Boulv', 'Br', 'Branch', 'Brdge', 'Brg', 'Bridge',
     'Brk', 'Brks', 'Brnch', 'Broadway', 'Brook', 'Brooks',
-    'Btm', 'Building', 'Bld', 'Burg', 'Burgs', 'Byp', 'Bypa', 'Bypas',
+    'Btm', 'Bld', 'Burg', 'Burgs', 'Byp', 'Bypa', 'Bypas',
     'Bypass', 'Byps', 'Byu', 'Camp', 'Canyn', 'Canyon',
     'Cape', 'Causeway', 'Causwa', 'Cen', 'Cent', 'Center',
     'Centers', 'Centr', 'Centre', 'Cir', 'Circ', 'Circl',
@@ -293,12 +317,22 @@ special_streets = r"""
 
 floor = r"""
             (?P<floor>
+                #English
                 (?:
-                \d+[A-Za-z]{0,2}\.?\ [Ff][Ll][Oo][Oo][Rr]\ ?
+                    \d+[A-Za-z]{0,2}\.?\ [Ff][Ll][Oo][Oo][Rr]\ ?
                 )
                 |
                 (?:
                     [Ff][Ll][Oo][Oo][Rr]\ \d+[A-Za-z]{0,2}\ ?
+                )
+                |
+                #French
+                (?:
+                    \d{{1,6}}[A-Za-z]{{0,3}}\.?\ [Éé][Tt][Aa][Gg][Ee][\.,\ ]
+                )
+                |
+                (?:
+                    [Éé][Tt][Aa][Gg][Ee]\ \d{{1,6}}[A-Za-z]{{0,3}}[\.,\ ]
                 )
             )
         """
@@ -362,6 +396,19 @@ occupancy = r"""
                             |
                             #Terrace
                             [Tt][Ee][Rr]{2}[Aa][Cc][Ee]\ 
+                            |
+                            # Level
+                            [Uu][Pp][Pp][Ee][Rr]\ [Ll][Ee][Vv][Ee][Ll]|
+                            [Ll][Oo][Ww][Ee][Rr]\ [Ll][Ee][Vv][Ee][Ll]
+                            |
+                            #  French Apartement
+                            [Aa][Pp][Aa][Rr][Tt][Ee][Mm][Ee][Nn][Tt]\ |A[Pp][Pp]\ 
+                            |
+                            #  French Bureau
+                            [Bb][Uu][Rr][Ee][Aa][Uu]\ 
+                            |
+                            #  French Unité
+                            [Uu][Nn][Ii][Tt][Éé]\ 
                         )
                         (?:
                             [A-Za-z\#\&\-\d]{1,7}
@@ -386,9 +433,33 @@ po_box = r"""
                     (?:[Pp][\ \.\n]{0,3}[Oo][\ \.\n]{1,3}[Bb][Oo][Xx][\ \n]{1,3}\d+)
                     |
                     (?:[Bb][Oo][Xx][\ \n]{1,3}\d+)
+                    |
+                    # French - B.P. 123
+                    (?:[Bb][\ \.]{0,2}[Pp][\ \.\n]{0,2}\d{1,6})
+                    |
+                    # C.P. 123 CP123 CP 123 C.P123 C.P.123 etc
+                    (?:[Cc][\ \.]{0,2}[Pp][\ \.\n]{0,2}\d{1,6})
+                    |
+                    # Case postale 123
+                    (?:[Cc]ase\ [Pp][Oo][Ss][Tt][Aa][Ll][Ee][\ \n]\d{1,6})
                 )
             )
         """
+
+station = r"""
+                (?P<station>
+                    (?:[Pp][Oo][Ss][Tt][Aa][Ll][Ee]?\ )?
+                    (?:
+                        #English
+                        (?:[Ss][Tt][Aa][Tt][Ii][Oo][Nn])|
+                        (?:[Ss][Tt][Nn]\.?)|
+                        #French
+                        (?:[Ss][Uu][Cc][Cc][Uu][Rr][Ss][Aa][Ll][Ee])|
+                        (?:[Ss][Uu][Cc][Cc]\.?)
+                    )
+                    \ [\“\'\"]?.{0,15}[\”\'\"]?
+                )
+"""
 
 dept_no = r"""
     (?:
@@ -406,11 +477,13 @@ dorm = r"""
         )
     )""".format(occupancy=occupancy)
 
+station_b = re.sub('<([a-z\_]+)>', r'<\1_b>', station)
 
 full_street = r"""
     (?P<full_street>
         (?:
             {po_box}{div}?
+            (?:{station_b}{div})?
             (?:{occupancy}{div})?
             (?:{dept_no}{div})?
         )
@@ -423,7 +496,7 @@ full_street = r"""
                 |
                 (?:
                     {street_name}{div}
-                    {street_type}{div}?
+                    {street_type}(?:{div})?
                 )
             )
             (?:{post_direction}{div})?
@@ -431,6 +504,7 @@ full_street = r"""
             (?:{building}{div})?
             (?:{occupancy}{div})?
             (?:{po_box}{div})?
+            (?:{station}{div})?
             (?:{dept_no}{div})?
         )
     )""".format(dorm=dorm,
@@ -444,9 +518,10 @@ full_street = r"""
                 occupancy=occupancy,
                 po_box=po_box,
                 div=restrictive_div,
-                special_streets=special_streets
+                special_streets=special_streets,
+                station=station,
+                station_b=station_b
                 )
-
 
 
 full_address = r"""

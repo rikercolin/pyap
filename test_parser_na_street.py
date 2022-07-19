@@ -1,12 +1,8 @@
-# -*- coding: utf-8 -*-
-
-""" Test for USA address parser """
-
 import re
 import pytest
 from pyap import utils
 from pyap.packages import six
-import pyap.source_US.data as data_us
+import pyap.source_NA_STREET.data as data_ns
 
 
 def execute_matching_test(input, expected, pattern):
@@ -20,7 +16,6 @@ def execute_matching_test(input, expected, pattern):
            - our match should be partial if regex matches some part of string
         """
         assert (is_found == expected) or (match.group(0) != input)
-
 
 @pytest.mark.parametrize("input,expected", [
     # positive assertions
@@ -42,7 +37,7 @@ def execute_matching_test(input, expected, pattern):
 ])
 def test_zero_to_nine(input, expected):
     ''' test string match for zero_to_nine '''
-    execute_matching_test(input, expected, data_us.zero_to_nine)
+    execute_matching_test(input, expected, data_ns.zero_to_nine)
 
 
 @pytest.mark.parametrize("input,expected", [
@@ -64,7 +59,7 @@ def test_zero_to_nine(input, expected):
 ])
 def test_ten_to_ninety(input, expected):
     ''' test string match for ten_to_ninety '''
-    execute_matching_test(input, expected, data_us.ten_to_ninety)
+    execute_matching_test(input, expected, data_ns.ten_to_ninety)
 
 
 @pytest.mark.parametrize("input,expected", [
@@ -77,7 +72,7 @@ def test_ten_to_ninety(input, expected):
 ])
 def test_hundred(input, expected):
     ''' tests string match for a hundred '''
-    execute_matching_test(input, expected, data_us.hundred)
+    execute_matching_test(input, expected, data_ns.hundred)
 
 
 @pytest.mark.parametrize("input,expected", [
@@ -92,7 +87,7 @@ def test_hundred(input, expected):
 ])
 def test_thousand(input, expected):
     ''' tests string match for a thousand '''
-    execute_matching_test(input, expected, data_us.thousand)
+    execute_matching_test(input, expected, data_ns.thousand)
 
 
 @pytest.mark.parametrize("input,expected", [
@@ -122,7 +117,7 @@ def test_thousand(input, expected):
 ])
 def test_street_number(input, expected):
     ''' tests string match for a street number '''
-    execute_matching_test(input, expected, data_us.street_number)
+    execute_matching_test(input, expected, data_ns.street_number)
 
 
 @pytest.mark.parametrize("input,expected", [
@@ -140,7 +135,7 @@ def test_street_number(input, expected):
 ])
 def test_street_name(input, expected):
     ''' tests positive string match for a street name '''
-    execute_matching_test(input, expected, data_us.street_name)
+    execute_matching_test(input, expected, data_ns.street_name)
 
 
 @pytest.mark.parametrize("input,expected", [
@@ -153,13 +148,14 @@ def test_street_name(input, expected):
     ("NW", True),
     ("SE", True),
     ("NW.", True),
+    ("N.O.", True),
     # negative assertions
     ("NS ", False),
     ("EW ", False),
 ])
 def test_post_direction(input, expected):
     ''' tests string match for a post_direction '''
-    execute_matching_test(input, expected, data_us.post_direction)
+    execute_matching_test(input, expected, data_ns.post_direction)
 
 
 @pytest.mark.parametrize("input,expected", [
@@ -179,6 +175,7 @@ def test_post_direction(input, expected):
     ("LP. ", True),
     ("LP. (Route A1 )", True),
     ("Street route 5 ", True),
+    ("Ctr", True),
     ("blvd", True),
     ("Estate", True),
     ("Manor", True),
@@ -188,7 +185,7 @@ def test_post_direction(input, expected):
 ])
 def test_street_type(input, expected):
     ''' tests string match for a street id '''
-    execute_matching_test(input, expected, data_us.street_type)
+    execute_matching_test(input, expected, data_ns.street_type)
 
 @pytest.mark.parametrize("input,expected", [
     # positive assertions
@@ -200,7 +197,7 @@ def test_street_type(input, expected):
 ])
 def test_special_streets(input, expected):
     ''' tests string match for special road types'''
-    execute_matching_test(input, expected, data_us.special_streets)
+    execute_matching_test(input, expected, data_ns.special_streets)
 
 
 @pytest.mark.parametrize("input,expected", [
@@ -219,7 +216,7 @@ def test_special_streets(input, expected):
 ])
 def test_floor(input, expected):
     ''' tests string match for a floor '''
-    execute_matching_test(input, expected, data_us.floor)
+    execute_matching_test(input, expected, data_ns.floor)
 
 
 @pytest.mark.parametrize("input,expected", [
@@ -242,7 +239,7 @@ def test_floor(input, expected):
 ])
 def test_building(input, expected):
     ''' tests string match for a building '''
-    execute_matching_test(input, expected, data_us.building)
+    execute_matching_test(input, expected, data_ns.building)
 
 
 @pytest.mark.parametrize("input,expected", [
@@ -273,7 +270,7 @@ def test_building(input, expected):
 ])
 def test_occupancy(input, expected):
     ''' tests string match for a place id '''
-    execute_matching_test(input, expected, data_us.occupancy)
+    execute_matching_test(input, expected, data_ns.occupancy)
 
 @pytest.mark.parametrize("input,expected", [
     # positive assertions
@@ -284,7 +281,7 @@ def test_occupancy(input, expected):
 ])
 def test_dorm(input, expected):
     ''' tests string match for a dorm'''
-    execute_matching_test(input, expected, data_us.dorm)
+    execute_matching_test(input, expected, data_ns.dorm)
 
 
 @pytest.mark.parametrize("input,expected", [
@@ -301,7 +298,7 @@ def test_dorm(input, expected):
 ])
 def test_po_box_positive(input, expected):
     ''' tests exact string match for a po box '''
-    execute_matching_test(input, expected, data_us.po_box)
+    execute_matching_test(input, expected, data_ns.po_box)
 
 
 @pytest.mark.parametrize("input,expected", [
@@ -361,153 +358,4 @@ def test_po_box_positive(input, expected):
 ])
 def test_full_street_positive(input, expected):
     ''' tests exact string match for a full street '''
-    execute_matching_test(input, expected, data_us.full_street)
-
-
-@pytest.mark.parametrize("input,expected", [
-    # positive assertions
-    ("0 OLD MILL RD, Maynard, MA 01754", True),
-    ("103 Morgan Lane, Suite 102 Plainsboro, NJ 08536", True),
-    ("3409 16th St Metairie, LA 70002", True),
-    ("1505 NW 14th Street Miami, FL 33125", True),
-    ("01 Main Rd. Newfield, NJ", True),
-    ("28 Gorgo Lane Newfield, NJ", True),
-    ("1720 HARDING HWY NEWFIELD, NJ", True),
-    ("4409 N DELSEA DR NEWFIELD, NJ", True),
-    ("742 FORSYTHIA DR NEWFIELD, NJ", True),
-    ("9 N EAST BLVD NEWFIELD, NJ 10000", True),
-    ("1640 Harding Hwy Newfield, NJ", True),
-    ("1720 Harding Highway NEWFIELD, NJ", True),
-    ("1014 CATAWBA AVE NEWFIELD, NJ", True),
-    ("11 ARCH AVE NEWFIELD, NJ", True),
-    ("133 TAYLOR RD NEWFIELD, NJ", True),
-    ("4409 N Delsea Drive Newfield, NJ", True),
-    ("8 TAYLOR RD NEWFIELD, NJ", True),
-    ("28 GORGO LN NEWFIELD, NJ", True),
-    ("900 COLUMBIA AVE. NEWFIELD, NJ", True),
-    ("3201 MAIN RD NEWFIELD, NJ", True),
-    ("4421 N DELSEA DR NEWFIELD, NJ", True),
-    ("742 Forsythia Drive Newfield, NJ", True),
-    ("1450 E. Chestnut Avenue, Vineland NJ", True),
-    ("50 Harry S Truman Parkway Annapolis, MD 21401", True),
-    ("420 Crompton Street Charlotte , North Carolina 28273", True),
-    ("204 East 3rd Ave Cheyenne, WY 82001", True),
-    ("1806 Dominion Way Ste B Colorado Spgs, CO 80918-8409", True),
-    ("2600 South Shore Blvd Ste. 300 League City, TX 77573", True),
-    ("2675 Antler Drive Carson City, NV 89701-1451", True),
-    ("3719 Lockwood Dr., Houston, TX 77026", True),
-    ("154 Grand Street New York, NY 10013", True),
-    ("3655 Torrance Blvd Suite 230 Torrance CA 90503", True),
-    ("800 Sixth Ave #31A New York, NY 10001", True),
-    ("8861 Research Drive, Ste. 200, Irvine, CA 92618", True),
-    ("317 N. Mission St. Ste. 200 Wenatchee, WA 98801", True),
-    ("2709 Bickford Avenue, Suite A Snohomish, WA 98290", True),
-    ("7307 N. Division Street, Suite 102 Spokane, WA 99208", True),
-    ("1530 South Union Avenue, Suite 7 Tacoma, WA 98405", True),
-    ("3131 Smokey Point Drive, Suite 14 A Arlington, WA 98223", True),
-    ("1603 Grove Street Marysville, WA 98270", True),
-    ("15701 E. Sprague Avenue, Suite F Spokane Valley, WA 99037", True),
-    ("18204 Bothell Everett Hwy, Suite E Bothell, WA 98012", True),
-    ("3505 188th Street SW Lynnwood, WA 98037", True),
-    ("3218 NE 12th Street, Suite B Renton, WA 98056", True),
-    ("22035 SE Wax Road, Suite 5 Maple Valley, WA 98038", True),
-    ("8861 Research Drive, Ste. 200 Irvine, CA 92618", True),
-    ("4031 University Drive Suite 200 Fairfax, Virginia 22030", True),
-    ("586 W. 207 St. New York, NY 10034", True),
-    ("85 Newbury St, Boston, MA 02116", True),
-    ("1827 Union St, San Francisco, CA 94123", True),
-    ("1636 Main St Sarasota, FL 34236", True),
-    ("1015 South Western Avenue, Chicago, IL 60649", True),
-    ("510 W 7th St. Los Angeles, CA 90014", True),
-    ("225 North Larchmont Blvd Los Angeles, CA 90004", True),
-    ("3760 E. Tremont Ave. Throgsneck, NY 10465", True),
-    ("8126 S. Stony Island Ave Chicago, IL 60617", True),
-    ("68116 HEM 908 B WEST 12th St. Austin, TX 78703", True),
-    ("546 West Colorado Street Glendale CA 91204", True),
-    ("2210 N Halsted St, Chicago, IL 60614", True),
-    ("4090 Westown Pkwy Ste B2 Chicago, IL 60614", True),
-    ("7000 Peachtree Dunwoody Rd NE Bldg 7, Miami, FL, USA", True),
-    ("98-025 Hekaha St Ste 221A, Cityville, Arizona", True),
-    ("225 E. John Carpenter Freeway, Suite 1500 Irving, Texas 75062 U.S.A.", True),
-    ("643 Lincoln Rd. Miami Beach, FL 33139", True),
-    ("300 Market St. Harrisburg, PA 17101", True),
-    ("2 Kings Hwy Shreveport, LA 71104", True),
-    ("1500 Westlake Avenue North Suite 108 Seattle, WA 98109", True),
-    ("840 Garrison Brooks Suite 985, New Sarah, OH 38255", True),
-    ("840 Garrison Brooks Suite 985 New Sarah, OH 38255", True),
-    ("840 Garrison Brooks Suite 985 New Sarah, State of Michigan 38255", True),
-    ("840 Garrison Brooks Rm. #985 New Sarah, commonwealth of Michigan 38255", True),
-    ("1090 1100 E, Salt Lake City, UT 84105", True),
-    # negative assertions
-    ("85 STEEL REGULAR SHAFT - NE", False),
-    ("3 STRUCTURE WITH PE", False),
-    ("2013 Courtesy of DONNA LUPI, PR", False),
-    ("44 sq. ft. 000 Columbia Ave. See Remarks, Newfield, NJ 08344", False),
-    ("7901 SILVER CONDUCTIVE HOLE FILL MA", False),
-    ("3 THIRD PARTY LIST IN", False),
-    ("9 STORAGE OF INDIVIDUAL IN", False),
-    ("4 BODY WAVE MODEL MO", False),
-    ("4060 AUTOMATIC STRAPPING MACHINE KZB-II STRAPPING MA", False),
-    ("130 AUTOMATIC STRAPPING MACHINE CO", False),
-    ("6060 AUTOMATIC STRAPPING MACHINE SK", False),
-    ("500 AUTO BLISTER PACKING SEALING MA", False),
-    ("23 ELECTRICAL COLOURED-TAPE PR", False),
-    ("1900 TRANSISTOR ELECTROMAGNETIC INDUCTION AL", False),
-    ("3131 DR. MATTHEW WI", False),
-    ("ONE FOR ANY DIRECT, INDIRECT, IN", False),
-    ("2 TRACTOR HEAD Actros MP", False),
-    ("00 Straight Fit Jean, USA", False),
-])
-def test_full_address(input, expected):
-    ''' tests exact string match for a full address '''
-    execute_matching_test(input, expected, data_us.full_address)
-
-
-@pytest.mark.parametrize("input,expected", [
-    # positive assertions
-    ("75062", True),
-    ("15032", True),
-    ("95130-6482", True),
-    # negative assertions
-    ("1", False),
-    ("23", False),
-    ("456", False),
-    ("4567", False),
-    ("750621", False),
-    ("95130-642", False),
-    ("95130-64212", False),
-])
-def test_postal_code(input, expected):
-    ''' test exact string match for postal code '''
-    execute_matching_test(input, expected, data_us.postal_code)
-
-
-@pytest.mark.parametrize("input,expected", [
-    # positive assertions
-    ("Montana", True),
-    ("Nebraska", True),
-    ("NJ", True),
-    ("nJ", True),
-    ("mi", True),
-    ("DC", True),
-    ("PuErTO RIco", True),
-    ("oregon", True),
-    ("state of michigan", True),
-    ("State of FLORiDA", True),
-    ("Commonwealth of Kentucky", True),
-    ("commonWEALTH OF Pennsylvania", True)
-])
-def test_region(input, expected):
-    ''' test exact string match for province '''
-    execute_matching_test(input, expected, data_us.region)
-
-
-@pytest.mark.parametrize("input,expected", [
-    # positive assertions
-    ("USA", True),
-    ("U.S.A", True),
-    ("United States", True),
-])
-def test_country(input, expected):
-    ''' test exact string match for country '''
-    execute_matching_test(input, expected, data_us.country)
+    execute_matching_test(input, expected, data_ns.full_street)
