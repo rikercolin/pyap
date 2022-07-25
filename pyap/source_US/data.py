@@ -176,9 +176,10 @@ Regexp for matching street name.
 In example below:
 "Hoover Boulevard": "Hoover" is a street name
 '''
-street_name = r"""(?P<street_name>
-                        (?:[a-zA-Z0-9][a-zA-Z0-9\ \.\-\n]{0,30})
-                    )
+street_name = r"""
+    (?P<street_name>
+        (?:[a-zA-Z0-9][a-zA-Z0-9\ \.\-\n]{0,30})
+    )
               """
 
 post_direction = r"""
@@ -198,20 +199,12 @@ post_direction = r"""
                         )
                         |
                         (?:
-                            N\.?W\.|N\.?E\.|S\.?W\.|S\.?E\.
+                            [NS]\.?[WE](?:[\.\ ]|\b)
                         )
                         |
                         (?:
-                            N\.|S\.|E\.|W\.
+                            [NSEW](?:[\.\ ]|\b)
                         )
-                        |
-                        (?:
-                            N\.?W|N\.?E|S\.?W|S\.?E
-                        )\b
-                        |
-                        (?:
-                            [NSEW]
-                        )\b
                     )
                 """
 
@@ -477,15 +470,15 @@ dorm = r"""
 Duplicate detection rules for different positional matches and mixed
 requirement rules.
 '''
-street_number_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_number)
-street_type_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_type)
-street_name_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_name)
-street_name_c = re.sub('<([a-z\_]+)>', r'<\1_c>', street_name)
-post_direction_b = re.sub('<([a-z\_]+)>', r'<\1_b>', post_direction)
-floor_b = re.sub('<([a-z\_]+)>', r'<\1_b>', floor)
-building_b = re.sub('<([a-z\_]+)>', r'<\1_b>', building)
-occupancy_b = re.sub('<([a-z\_]+)>', r'<\1_b>', occupancy)
-dorm_b = re.sub('<([a-z\_]+)>', r'<\1_b>', dorm)
+street_number_b = re.sub('<([a-z_]+)>', r'<\1_b>', street_number)
+street_type_b = re.sub('<([a-z_]+)>', r'<\1_b>', street_type)
+street_name_b = re.sub('<([a-z_]+)>', r'<\1_b>', street_name)
+street_name_c = re.sub('<([a-z_]+)>', r'<\1_c>', street_name)
+post_direction_b = re.sub('<([a-z_]+)>', r'<\1_b>', post_direction)
+floor_b = re.sub('<([a-z_]+)>', r'<\1_b>', floor)
+building_b = re.sub('<([a-z_]+)>', r'<\1_b>', building)
+occupancy_b = re.sub('<([a-z_]+)>', r'<\1_b>', occupancy)
+dorm_b = re.sub('<([a-z_]+)>', r'<\1_b>', dorm)
 
 full_street_no_street_type = r"""
     (?P<full_street_b>
@@ -529,6 +522,7 @@ full_street = r"""
                     {street_name}{div}
                     {street_type}(?:{div})?
                 )
+            )
             (?:{post_direction}{div})?
             (?:{floor}{div})?
             (?:{building}{div})?
@@ -670,19 +664,67 @@ country = r"""
             )
             """
 
-postal_code_b = re.sub('<([a-z\_]+)>', r'<\1_b>', postal_code)
-postal_code_c = re.sub('<([a-z\_]+)>', r'<\1_c>', postal_code)
+military_postal_type = r"""
+    (?:
+        (?:
+            UNIT|PSC|CMR
+        )\ \d{1,6}
+    )
+"""
+military_box = r"""
+    (?:
+        BOX\ \d{3,4}
+    )
+"""
 
-region_b = re.sub('<([a-z\_]+)>', r'<\1_b>', region)
-region_c = re.sub('<([a-z\_]+)>', r'<\1_c>', region)
+military_branch = r"""
+    (?:
+        APO|FPO|DPO
+    )
+"""
+
+military_state_codes = r"""
+    (?:
+        AA|AE|AP
+    )
+"""
+
+postal_code_b = re.sub('<([a-z_]+)>', r'<\1_b>', postal_code)
+postal_code_c = re.sub('<([a-z_]+)>', r'<\1_c>', postal_code)
+postal_code_d = re.sub('<([a-z_]+)>', r'<\1_d>', postal_code)
+
+region_b = re.sub('<([a-z_]+)>', r'<\1_b>', region)
+region_c = re.sub('<([a-z_]+)>', r'<\1_c>', region)
+
+military_full_address = r"""
+    (?P<military_address>
+        {military_postal_type}{div}
+        {military_box}{div}
+        {military_branch}{div}
+        {military_state_codes}
+    )
+""".format(
+    div=restrictive_div,
+    military_postal_type=military_postal_type,
+    military_box=military_box,
+    military_branch=military_branch,
+    military_state_codes=military_state_codes,
+)
 
 full_address = r"""
                 (?P<full_address>
-                    (?:{full_street}|{full_street_no_street_type}) {div}?
-                    {city} {div}?
-
                     (?:
-                        (?:{postal_code}|{region})(?:{div}{country})?(?(postal_code)(?(full_street)(?:{div}{region_b})?|(?:{div}{region_c}))|(?(full_street)(?:{div}{postal_code_b})?|{div}{postal_code_c}))(?:{div}{country})?
+                        (?:{full_street}|{full_street_no_street_type}) {div}?
+                        {city} {div}?
+
+                        (?:
+                            (?:{postal_code}|{region})(?:{div}{country})?(?(postal_code)(?(full_street)(?:{div}{region_b})?|(?:{div}{region_c}))|(?(full_street)(?:{div}{postal_code_b})?|{div}{postal_code_c}))(?:{div}{country})?
+                        )
+                    )
+                    |
+                    (?:
+                        {military_full_address}{div}
+                        {postal_code_d}
                     )
                 )
                 """.format(
@@ -694,7 +736,9 @@ full_address = r"""
     region_b=region_b,
     region_c=region_c,
     country=country,
+    military_full_address=military_full_address,
     postal_code=postal_code,
     postal_code_b=postal_code_b,
     postal_code_c=postal_code_c,
+    postal_code_d=postal_code_d,
 )

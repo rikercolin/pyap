@@ -146,12 +146,12 @@ def test_street_name(input, expected):
 @pytest.mark.parametrize("input,expected", [
     # positive assertions
     ("N.", True),
-    ("N", True),
-    ("S", True),
+    ("N ", True),
+    ("S ", True),
     ("West ", True),
     ("eASt ", True),
-    ("NW", True),
-    ("SE", True),
+    ("NW ", True),
+    ("SE ", True),
     ("NW.", True),
     # negative assertions
     ("NS ", False),
@@ -436,6 +436,8 @@ def test_full_street_positive(input, expected):
     ("840 Garrison Brooks Suite 985 New Sarah, OH 38255", True),
     ("840 Garrison Brooks Suite 985 New Sarah, State of Michigan 38255", True),
     ("840 Garrison Brooks Rm. #985 New Sarah, commonwealth of Michigan 38255", True),
+    ("UNIT 8400 BOX 0000 DPO AE 09498-0048", True),
+    ("PSC 3 BOX 400 DPO AE 09021", True),
     ("1090 1100 E, Salt Lake City, UT 84105", True),
     # negative assertions
     ("85 STEEL REGULAR SHAFT - NE", False),
@@ -460,6 +462,34 @@ def test_full_street_positive(input, expected):
 def test_full_address(input, expected):
     ''' tests exact string match for a full address '''
     execute_matching_test(input, expected, data_us.full_address)
+
+@pytest.mark.parametrize("input,expected", [
+    ("BOX 3", True),
+    ("BOX 4002", True),
+])
+def test_military_address(input, expected):
+    execute_matching_test(input, expected, data_us.military_box)
+
+@pytest.mark.parametrize("input,expected", [
+    ("PSC 100", True),
+    ("CMR 1000", True),
+    ("PSC 999", True),
+
+    ("PSC 99", False),
+])
+def test_military_address(input, expected):
+    execute_matching_test(input, expected, data_us.military_postal_type)
+
+
+@pytest.mark.parametrize("input,expected", [
+    ("PSC 3 BOX 4120 APO AE", True),
+    ("UNIT 100100 BOX 4120 FPO AP", True),
+    ("UNIT 2340 BOX 132 APO AE", True),
+    ("UNIT 8400 BOX 0000 DPO AE", True),
+])
+def test_military_address(input, expected):
+    ''' test exact string match for military full address '''
+    execute_matching_test(input, expected, data_us.military_full_address)
 
 
 @pytest.mark.parametrize("input,expected", [
