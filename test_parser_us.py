@@ -47,7 +47,6 @@ def test_zero_to_nine(input, expected):
 
 @pytest.mark.parametrize("input,expected", [
     # positive assertions
-    ("tEN ", True),
     ("TWENTY ", True),
     ("tHirtY ", True),
     ("FOUrty ", True),
@@ -64,7 +63,7 @@ def test_zero_to_nine(input, expected):
 ])
 def test_ten_to_ninety(input, expected):
     ''' test string match for ten_to_ninety '''
-    execute_matching_test(input, expected, data_us.ten_to_ninety)
+    execute_matching_test(input, expected, data_us.twenty_to_ninety)
 
 
 @pytest.mark.parametrize("input,expected", [
@@ -119,6 +118,7 @@ def test_thousand(input, expected):
     ("111111 ", False),
     ("1111ss11", False),
     ("123 456", False),
+    ("-456", False),
 ])
 def test_street_number(input, expected):
     ''' tests string match for a street number '''
@@ -183,7 +183,6 @@ def test_post_direction(input, expected):
     ("Estate", True),
     ("Manor", True),
     # negative assertions
-    # TODO
 
 ])
 def test_street_type(input, expected):
@@ -310,7 +309,7 @@ def test_po_box_positive(input, expected):
     ("101 MacIntosh Boulevard", True),
     ("1 West Hegeler Lane", True),
     ("1270 Leeds Avenue", True),
-    ("85-1190 Ranchview Rd. NW", True),
+    ("85-1190 Ranchview Rd. NW ", True),
     ("62 Portland Road (Route 1)", True),
     ("200 N. Pine Avenue Suite 514 ", True),
     ("200 S. Alloy Drive", True),
@@ -324,11 +323,11 @@ def test_po_box_positive(input, expected):
     ("9 Grand Avenue Building 2, Suite 2,", True),
     ("9 Grand Avenue Building 2, Suite 2A,", True),
     ("233 Richmond Highway Suite 1800 ", True),
-    ("354 Eisenhower Parkway P.O. Box 472,", True),
+    ("354 Eisenhower Parkway P.O. Box 472 ,", True),
     ("6645 N Ensign St", True),
     ("1200 Old Fairhaven Pkwy Apt 106,", True),
     ("1659 Scott Blvd Ste 26,", True),
-    ("377 Fisher Rd Ste C", True),
+    ("377 Fisher Rd Ste C ", True),
     ("1833 Stearman Ave", True),
     ("1737 S Lumpkin St Ste B,", True),
     ("101 N Court Sq Ste 16,", True),

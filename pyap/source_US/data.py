@@ -45,8 +45,8 @@ zero_to_nine = r"""(?:
     )"""
 
 # Numerals - 10, 20, 30 ... 90
-ten_to_ninety = r"""(?:
-    [Tt][Ee][Nn]\ ?|[Tt][Ww][Ee][Nn][Tt][Yy]\ ?|
+twenty_to_ninety = r"""(?:
+    [Tt][Ww][Ee][Nn][Tt][Yy]\ ?|
     [Tt][Hh][Ii][Rr][Tt][Yy]\ ?|
     [Ff][Oo][Rr][Tt][Yy]\ ?|
     [Ff][Oo][Uu][Rr][Tt][Yy]\ ?|
@@ -69,14 +69,7 @@ thousand = r"""(?:
 
 post_number_directions = r"""
                             (?:
-                                (?:\d[\ ,\-]{0,2}N\b|N\d) |
-                                (?:\d[\ ,\-]{0,2}S\b|S\d) |
-                                (?:\d[\ ,\-]{0,2}E\b|E\d) |
-                                (?:\d[\ ,\-]{0,2}W\b|W\d) |
-
-                                (?:\d[\ ,\-]{0,2}P\b|P\d) |
-                                (?:\d[\ ,\-]{0,2}D\b|D\d) |
-                                (?:\d[\ ,\-]{0,2}A\b|A\d)
+                                (?:\d[\ ,\-]{0,2}[NSEWPDA]\b)|(?:[NSEWPDA]\d)
                             )
 """
 
@@ -162,6 +155,7 @@ street_number = r"""(?P<street_number>
                         ){{0,4}}\,?
                         |
                         (?:
+                            (?:\d|{post_number_directions})
                             (?:\-|\d|{post_number_directions}){from_to}
                         )
                     )
@@ -172,10 +166,10 @@ street_number = r"""(?P<street_number>
                 """.format(thousand=thousand,
                            hundred=hundred,
                            zero_to_nine=zero_to_nine,
-                           ten_to_ninety=ten_to_ninety,
+                           ten_to_ninety=twenty_to_ninety,
                            post_number_directions=post_number_directions,
                            exclusions=street_number_follow_exclusions,
-                           from_to='{1,7}')
+                           from_to='{0,6}')
 
 '''
 Regexp for matching street name.
@@ -191,14 +185,17 @@ post_direction = r"""
                     (?P<post_direction>
                         (?:
                             [Nn][Oo][Rr][Tt][Hh]\ |
-                            [Ss][Oo][Uu][Tt][Hh]\ |
-                            [Ee][Aa][Ss][Tt]\ |
-                            [Ww][Ee][Ss][Tt]\ 
+                            [Ss][Oo][Uu][Tt][Hh]\ 
                         )
                         (?:
                             \s?[Ee][Aa][Ss][Tt]\ |
                             \s?[Ww][Ee][Ss][Tt]\ 
                         )?
+                        |
+                        (?:
+                            [Ee][Aa][Ss][Tt]\ |
+                            [Ww][Ee][Ss][Tt]\ 
+                        )
                         |
                         (?:
                             N\.?W\.|N\.?E\.|S\.?W\.|S\.?E\.
@@ -213,7 +210,7 @@ post_direction = r"""
                         )\b
                         |
                         (?:
-                            N|S|E|W
+                            [NSEW]
                         )\b
                     )
                 """
@@ -410,7 +407,7 @@ building = r"""
             """.format(thousand=thousand,
                        hundred=hundred,
                        zero_to_nine=zero_to_nine,
-                       ten_to_ninety=ten_to_ninety,
+                       ten_to_ninety=twenty_to_ninety,
                        )
 
 occupancy = r"""
@@ -481,7 +478,9 @@ Duplicate detection rules for different positional matches and mixed
 requirement rules.
 '''
 street_number_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_number)
+street_type_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_type)
 street_name_b = re.sub('<([a-z\_]+)>', r'<\1_b>', street_name)
+street_name_c = re.sub('<([a-z\_]+)>', r'<\1_c>', street_name)
 post_direction_b = re.sub('<([a-z\_]+)>', r'<\1_b>', post_direction)
 floor_b = re.sub('<([a-z\_]+)>', r'<\1_b>', floor)
 building_b = re.sub('<([a-z\_]+)>', r'<\1_b>', building)
@@ -530,7 +529,6 @@ full_street = r"""
                     {street_name}{div}
                     {street_type}(?:{div})?
                 )
-            )
             (?:{post_direction}{div})?
             (?:{floor}{div})?
             (?:{building}{div})?
@@ -675,8 +673,8 @@ country = r"""
 postal_code_b = re.sub('<([a-z\_]+)>', r'<\1_b>', postal_code)
 postal_code_c = re.sub('<([a-z\_]+)>', r'<\1_c>', postal_code)
 
-region_b = re.sub('<([a-z\_]+)>', r'<\1__b>', region)
-region_c = re.sub('<([a-z\_]+)>', r'<\1__c>', region)
+region_b = re.sub('<([a-z\_]+)>', r'<\1_b>', region)
+region_c = re.sub('<([a-z\_]+)>', r'<\1_c>', region)
 
 full_address = r"""
                 (?P<full_address>
