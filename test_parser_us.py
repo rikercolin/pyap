@@ -162,6 +162,22 @@ def test_post_direction(input, expected):
     ''' tests string match for a post_direction '''
     execute_matching_test(input, expected, data_us.post_direction)
 
+@pytest.mark.parametrize("input,expected", [
+    #Possitive Assertions
+    ("1/3rd", True),
+    ("1/2", True),
+    ("3/4th", True),
+    ("2/3rd", True),
+    #Negative Assertions
+    ("1/1", False),
+    ("1/2st", False),
+    ("1/0", False),
+    ("9/1", False),
+])
+def test_post_direction(input, expected):
+    ''' tests string match for a street fraction'''
+    execute_matching_test(input, expected, data_us.street_fractions)
+
 
 @pytest.mark.parametrize("input,expected", [
     # positive assertions
@@ -197,10 +213,39 @@ def test_street_type(input, expected):
     ("US HwY 999", True),
     ("Highway 12", True),
     ("us rouTE 2", True),
+    ("COUNTY HIGHWAY 140", True),
+    ("CNTY HWY 20E", True),
+    ("COUNTY RD 441", True),
+    ("CR 1185", True),
+    ("CNTY RD 33", True),
+    ("CA COUNTY RD 150", True),
+    ("EXPRESSWAY 55", True),
+    ("FARM to MARKET 1200", True),
+    ("FM 187", True),
+    ("HWY FM 1320", True),
+    ("HIGHWAY 101", True),
+    ("HIWAY 1080A", True),
+    ("HWY 11 BYPASS", True),
+    ("I10", True),
+    ("INTERSTATE 40", True),
+    ("IH280", True),
+    ("INTERSTATE HWY 680", True),
+    ("I 55 BYPASS", True),
+    ("LOOP 410", True),
+    ("RD 5A", True),
+    ("RTE 95", True),
+    ("RT 88", True),
+    ("RANCH RD 620", True),
+    ("ROUTE 1150EE", True),
+    ("SR MM", True),
+    ("STATE ROAD 55", True),
+    ("TSR 45", True),
+    ("KENTUCKY HIGHWAY 189", True),
+    ("KENTUCKY STATE HIGHWAY 625", True),
 ])
 def test_special_streets(input, expected):
     ''' tests string match for special road types'''
-    execute_matching_test(input, expected, data_us.special_streets)
+    execute_matching_test(input, expected, data_us.highways)
 
 
 @pytest.mark.parametrize("input,expected", [
@@ -211,19 +256,6 @@ def test_special_streets(input, expected):
     ("1st floor", True),
     ("2nd floor", True),
     ("15th floor", True),
-    ("16th. floor", True),
-    # negative assertions
-    ("16th.floor", False),
-    ("1stfloor", False),
-
-])
-def test_floor(input, expected):
-    ''' tests string match for a floor '''
-    execute_matching_test(input, expected, data_us.occupancy)
-
-
-@pytest.mark.parametrize("input,expected", [
-    # positive assertions
     ("bldg m", True),
     ("Building F", True),
     ("bldg 2", True),
@@ -233,20 +265,7 @@ def test_floor(input, expected):
     ("Building", False),
     ("building one ", False),
     ("Building three ", False),
-    # negative assertions
-    ("bldg", False),
-    ("bldgm", False),
-    ("bldg100 ", False),
-    ("building 10000 ", False),
-
-])
-def test_building(input, expected):
-    ''' tests string match for a building '''
-    execute_matching_test(input, expected, data_us.occupancy)
-
-
-@pytest.mark.parametrize("input,expected", [
-    # positive assertions
+    ("bldgm", True),
     ("suite 900", True),
     ("Suite #2", True),
     ("suite #218", True),
@@ -269,6 +288,13 @@ def test_building(input, expected):
     ("suite900", True),
     ("Suite#2", True),
     ("suite218", True),
+    # negative assertions
+    ("16th. floor", False),
+    ("16th.floor", False),
+    ("1stfloor", False),
+    ("bldg", False),
+    ("bldg100 ", False),
+    ("building 10000 ", False),
 ])
 def test_occupancy(input, expected):
     ''' tests string match for a place id '''

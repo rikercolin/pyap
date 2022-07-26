@@ -208,6 +208,107 @@ post_direction = r"""
                     )
                 """
 
+# region is actually a "state"
+region = r"""
+    (?P<region>
+        \b(?:
+            #State Abbreviations
+            [Aa]\.?(?:[Ll]|[Kk]|[Zz]|[Rr])|
+            [Cc]\.?(?:[Aa]|[Oo]|[Tt])|
+            [Dd]\.?(?:[Ee]|[Cc])|
+            [Ff]\.?[Ll]|
+            [Gg]\.?[Aa]|
+            [Hh]\.?[Ii]|
+            [Ii]\.?(?:[Dd]|[Ll]|[Nn]|[Aa])|
+            [Kk]\.?(?:[Ss]|[Yy])|
+            [Ll]\.?[Aa]|
+            [Mm]\.?(?:[Ee]|[Dd]|[Aa]|[Ii]|[Nn]|[Ss]|[Oo]|[Tt])|
+            [Nn]\.?(?:[Ee]|[Vv]|[Hh]|[Jj]|[Mm]|[Yy]|[Cc]|[Dd])|
+            [Oo]\.?(?:[Hh]|[Kk]|[Rr])|
+            [Pp]\.?[Aa]|
+            [Rr]\.?[Ii]|
+            [Ss]\.?(?:[Cc]|[Dd])|
+            [Tt]\.?(?:[Nn]|[Xx])|
+            [Uu]\.?[Tt]|
+            [Vv]\.?(?:[Tt]|[Aa])|
+            [Ww]\.?(?:[Aa]|[Vv]|[Ii]|[Yy])|
+
+            # unincorporated & commonwealth territories
+            [Aa]\.?[Ss]|
+            [Ff]\.?[Mm]|
+            [Gg]\.?[Uu]|
+            [Mm]\.?(?:[Hh]|[Pp])|
+            [Pp]\.?[Rr]|
+            [Vv]\.?[Ii]
+        )\b
+        |
+        (?:[Ss][Tt][Aa][Tt][Ee]\ [Oo][Ff]\ )?
+        (?:[Cc][Oo][Mm][Mm][Oo][Nn][Ww][Ee][Aa][Ll][Tt][Hh]\ [Oo][Ff]\ )?
+        (?:
+            # states full
+            [Aa][Ll][Aa][Bb][Aa][Mm][Aa]|
+            [Aa][Ll][Aa][Ss][Kk][Aa]|
+            [Aa][Rr][Ii][Zz][Oo][Nn][Aa]|
+            [Aa][Rr][Kk][Aa][Nn][Ss][Aa][Ss]|
+            [Cc][Aa][Ll][Ii][Ff][Oo][Rr][Nn][Ii][Aa]|
+            [Cc][Oo][Ll][Oo][Rr][Aa][Dd][Oo]|
+            [Cc][Oo][Nn][Nn][Ee][Cc][Tt][Ii][Cc][Uu][Tt]|
+            [Dd][Ee][Ll][Aa][Ww][Aa][Rr][Ee]|
+            [Dd][Ii][Ss][Tt][Rr][Ii][Cc][Tt]\ [Oo][Ff]\ 
+            [Cc][Oo][Ll][Uu][Mm][Bb][Ii][Aa]|
+            [Ff][Ll][Oo][Rr][Ii][Dd][Aa]|
+            [Gg][Ee][Oo][Rr][Gg][Ii][Aa]|
+            [Hh][Aa][Ww][Aa][Ii][Ii]|
+            [Ii][Dd][Aa][Hh][Oo]|
+            [Ii][Ll][Ll][Ii][Nn][Oo][Ii][Ss]|
+            [Ii][Nn][Dd][Ii][Aa][Nn][Aa]|
+            [Ii][Oo][Ww][Aa]|
+            [Kk][Aa][Nn][Ss][Aa][Ss]|
+            [Kk][Ee][Nn][Tt][Uu][Cc][Kk][Yy]|
+            [Ll][Oo][Uu][Ii][Ss][Ii][Aa][Nn][Aa]|
+            [Mm][Aa][Ii][Nn][Ee]|
+            [Mm][Aa][Rr][Yy][Ll][Aa][Nn][Dd]|
+            [Mm][Aa][Ss][Ss][Aa][Cc][Hh][Uu][Ss][Ee][Tt][Tt][Ss]|
+            [Mm][Ii][Cc][Hh][Ii][Gg][Aa][Nn]|
+            [Mm][Ii][Nn][Nn][Ee][Ss][Oo][Tt][Aa]|
+            [Mm][Ii][Ss][Ss][Ii][Ss][Ss][Ii][Pp][Pp][Ii]|
+            [Mm][Ii][Ss][Ss][Oo][Uu][Rr][Ii]|
+            [Mm][Oo][Nn][Tt][Aa][Nn][Aa]|
+            [Nn][Ee][Bb][Rr][Aa][Ss][Kk][Aa]|
+            [Nn][Ee][Vv][Aa][Dd][Aa]|
+            [Nn][Ee][Ww]\ [Hh][Aa][Mm][Pp][Ss][Hh][Ii][Rr][Ee]|
+            [Nn][Ee][Ww]\ [Jj][Ee][Rr][Ss][Ee][Yy]|
+            [Nn][Ee][Ww]\ [Mm][Ee][Xx][Ii][Cc][Oo]|
+            [Nn][Ee][Ww]\ [Yy][Oo][Rr][Kk]|
+            [Nn][Oo][Rr][Tt][Hh]\ [Cc][Aa][Rr][Oo][Ll][Ii][Nn][Aa]|
+            [Nn][Oo][Rr][Tt][Hh]\ [Dd][Aa][Kk][Oo][Tt][Aa]|
+            [Oo][Hh][Ii][Oo]|
+            [Oo][Kk][Ll][Aa][Hh][Oo][Mm][Aa]|
+            [Oo][Rr][Ee][Gg][Oo][Nn]|
+            [Pp][Ee][Nn][Nn][Ss][Yy][Ll][Vv][Aa][Nn][Ii][Aa]|
+            [Rr][Hh][Oo][Dd][Ee]\ [Ii][Ss][Ll][Aa][Nn][Dd]|
+            [Ss][Oo][Uu][Tt][Hh]\ [Cc][Aa][Rr][Oo][Ll][Ii][Nn][Aa]|
+            [Ss][Oo][Uu][Tt][Hh]\ [Dd][Aa][Kk][Oo][Tt][Aa]|
+            [Tt][Ee][Nn][Nn][Ee][Ss][Ss][Ee][Ee]|
+            [Tt][Ee][Xx][Aa][Ss]|
+            [Uu][Tt][Aa][Hh]|
+            [Vv][Ee][Rr][Mm][Oo][Nn][Tt]|
+            [Vv][Ii][Rr][Gg][Ii][Nn][Ii][Aa]|
+            [Ww][Aa][Ss][Hh][Ii][Nn][Gg][Tt][Oo][Nn]|
+            [Ww][Ee][Ss][Tt]\ [Vv][Ii][Rr][Gg][Ii][Nn][Ii][Aa]|
+            [Ww][Ii][Ss][Cc][Oo][Nn][Ss][Ii][Nn]|
+            [Ww][Yy][Oo][Mm][Ii][Nn][Gg]|
+            # unincorporated & commonwealth territories
+            [Aa][Mm][Ee][Rr][Ii][Cc][Aa][Nn]\ [Ss][Aa][Mm][Oo][Aa]
+            |[Gg][Uu][Aa][Mm]|
+            [Nn][Oo][Rr][Tt][Hh][Ee][Rr][Nn]\ [Mm][Aa][Rr][Ii][Aa][Nn][Aa]\ 
+            [Ii][Ss][Ll][Aa][Nn][Dd][Ss]|
+            [Pp][Uu][Ee][Rr][Tt][Oo]\ [Rr][Ii][Cc][Oo]|
+            [Vv][Ii][Rr][Gg][Ii][Nn]\ [Ii][Ss][Ll][Aa][Nn][Dd][Ss]
+        )
+    )
+"""
+
 # This list was taken from: https://pe.usps.com/text/pub28/28apc_002.htm
 # Broadway and Lp (abbreviation for Loop) were added to the list
 street_type_list = [
@@ -305,7 +406,7 @@ street_type_list = [
     'Wls', 'Wy', 'Xing', 'Xrd', 'Xrds',
 ]
 
-removed_street_type_list = ['Is']
+# removed_street_type_list = ['Is']
 
 
 def street_type_list_to_regex(street_type_list):
@@ -323,6 +424,9 @@ def street_type_list_to_regex(street_type_list):
         div=r'[\.\ ,]{0,2}',
     )
 
+street_fractions = r"""
+    (?:[123]\/[2-9](?:[Rr][Dd]|[Tt][Hh])?)
+"""
 
 # Regexp for matching street type
 street_type = r"""
@@ -340,16 +444,57 @@ street_type = r"""
     street_types=street_type_list_to_regex(street_type_list),
 )
 
-special_streets = r"""
-        (?:
-            (?:OH-\d{2})|
-            (?:[Cc][Oo][Uu][Nn][Tt][Yy]\ [Rr][Oo][Aa][Dd]\ \d{2}) |
-            (?:(?:[Uu][Ss]\ )?[Hh][Ww][Yy]\ \d{2,3}) |
-            (?:(?:[Uu][Ss]\ )?[Hh][Ii][Gg][Hh][Ww][Aa][Yy]\ \d{2,3}) |
-            (?:(?:[Uu][Ss]\ )?[Rr][Oo][Uu][Tt][Ee]\ \d{1,3}) |
-            (?:\b(?:[NSEW]\ )?\d{2,4}\ [NSEW]\b(?=.{0,50}UT|[Uu][Tt][Aa][Hh]))
-        )
+highway_prefix = r"""
+    (?:
+        [Cc][Oo][Uu][Nn][Tt][Yy]|[Cc][Nn][Tt][Yy]|
+        [Hh][Ii][Gg][Hh][Ww][Aa][Yy]|[Hh][Ww][Yy]|
+        [Ii][Nn][Tt][Ee][Rr][Ss][Tt][Aa][Tt][Ee]|
+        [Rr][Aa][Nn][Cc][Hh]|
+        [Ss][Tt][Aa][Tt][Ee]|
+        [Tt][Oo][Ww][Nn][Ss][Hh][Ii][Pp]|[Tt][Ss][Rr]|
+        [Uu][Ss]
+    )
 """
+
+highway_suffix = r"""
+    (?:
+        [Bb][Yy][Pp][Aa][Ss][Ss]|[Bb][Yy][Pp]
+    )
+"""
+
+highway_types = r"""
+    (?:
+        [Cc][Rr]|
+        [Ee][Xx][Pp][Rr][Ee][Ss][Ss][Ww][Aa][Yy]|
+        [Ff][Aa][Rr][Mm]\ [Tt][Oo]\ [Mm][Aa][Rr][Kk][Ee][Tt]|[Ff][Mm]|
+        [Hh][Ii][Gg][Hh][Ww][Aa][Yy]|[Hh][Ww][Yy]|[Hh][Ii][Ww][Aa][Yy]|
+        [Ii][Nn][Tt][Ee][Rr][Ss][Tt][Aa][Tt][Ee]|[I]|[Ii][Hh]|
+        [Ll][Oo][Oo][Pp]|
+        [Rr][Oo][Aa][Dd]|[Rr][Dd]|
+        [Rr][Tt]|
+        [Rr][Oo][Uu][Tt][Ee]|[Rr][Tt][Ee]|
+        [Ss][Rr]
+    )
+"""
+region_d = re.sub('<([a-z_]+)>', r'<\1_d>', region)
+highways = r"""
+    (?:
+        (?P<highway_prefix>
+            (?:{region_d}(?:(?:\-)|{div}))?
+            (?(region_d)(?:{highway_prefix}{div})?|{highway_prefix}{div})
+        )?
+        (?(highway_prefix)
+            (?:{highway_types}{div})?|(?:{highway_types}{div})
+        )
+        (?:(?:\d{{1,4}}[A-Z]{{0,2}})|(?:[A-Z]{{1,2}}))
+        (?:{div}{highway_suffix})?
+    )
+""".format(
+    div=restrictive_div,
+    highway_prefix=highway_prefix,
+    highway_types=highway_types,
+    highway_suffix=highway_suffix,
+    region_d=region_d)
 
 secondary_unit_designators_require_range = r"""
     (?:
@@ -378,7 +523,7 @@ secondary_unit_designators_require_range = r"""
         (?:
             [\ -#\n]{0,2}
             (?:[Nn][Oo][\ -#\n]{0,2})?
-            [A-Za-z#\-&\d]{1,7}
+            [A-Za-z#\-&0-9]{1,7}
         )
     )
 """
@@ -483,7 +628,7 @@ full_street = r"""
             (?:{dorm}{div})?
             {street_number}{div}
             (?:
-                (?:{special_streets}{div}?)
+                (?:{highways}{div}?)
                 |
                 (?:
                     {street_name}{div}
@@ -504,109 +649,8 @@ full_street = r"""
                 occupancy=occupancy,
                 po_box=po_box,
                 div=restrictive_div,
-                special_streets=special_streets
+                highways=highways,
                 )
-
-# region is actually a "state"
-region = r"""
-        (?P<region>
-            \b(?:
-                #State Abbreviations
-                [Aa]\.?(?:[Ll]|[Kk]|[Zz]|[Rr])|
-                [Cc]\.?(?:[Aa]|[Oo]|[Tt])|
-                [Dd]\.?(?:[Ee]|[Cc])|
-                [Ff]\.?[Ll]|
-                [Gg]\.?[Aa]|
-                [Hh]\.?[Ii]|
-                [Ii]\.?(?:[Dd]|[Ll]|[Nn]|[Aa])|
-                [Kk]\.?(?:[Ss]|[Yy])|
-                [Ll]\.?[Aa]|
-                [Mm]\.?(?:[Ee]|[Dd]|[Aa]|[Ii]|[Nn]|[Ss]|[Oo]|[Tt])|
-                [Nn]\.?(?:[Ee]|[Vv]|[Hh]|[Jj]|[Mm]|[Yy]|[Cc]|[Dd])|
-                [Oo]\.?(?:[Hh]|[Kk]|[Rr])|
-                [Pp]\.?[Aa]|
-                [Rr]\.?[Ii]|
-                [Ss]\.?(?:[Cc]|[Dd])|
-                [Tt]\.?(?:[Nn]|[Xx])|
-                [Uu]\.?[Tt]|
-                [Vv]\.?(?:[Tt]|[Aa])|
-                [Ww]\.?(?:[Aa]|[Vv]|[Ii]|[Yy])|
-
-                # unincorporated & commonwealth territories
-                [Aa]\.?[Ss]|
-                [Ff]\.?[Mm]|
-                [Gg]\.?[Uu]|
-                [Mm]\.?(?:[Hh]|[Pp])|
-                [Pp]\.?[Rr]|
-                [Vv]\.?[Ii]
-            )\b
-            |
-            (?:[Ss][Tt][Aa][Tt][Ee]\ [Oo][Ff]\ )?
-            (?:[Cc][Oo][Mm][Mm][Oo][Nn][Ww][Ee][Aa][Ll][Tt][Hh]\ [Oo][Ff]\ )?
-            (?:
-                # states full
-                [Aa][Ll][Aa][Bb][Aa][Mm][Aa]|
-                [Aa][Ll][Aa][Ss][Kk][Aa]|
-                [Aa][Rr][Ii][Zz][Oo][Nn][Aa]|
-                [Aa][Rr][Kk][Aa][Nn][Ss][Aa][Ss]|
-                [Cc][Aa][Ll][Ii][Ff][Oo][Rr][Nn][Ii][Aa]|
-                [Cc][Oo][Ll][Oo][Rr][Aa][Dd][Oo]|
-                [Cc][Oo][Nn][Nn][Ee][Cc][Tt][Ii][Cc][Uu][Tt]|
-                [Dd][Ee][Ll][Aa][Ww][Aa][Rr][Ee]|
-                [Dd][Ii][Ss][Tt][Rr][Ii][Cc][Tt]\ [Oo][Ff]\ 
-                [Cc][Oo][Ll][Uu][Mm][Bb][Ii][Aa]|
-                [Ff][Ll][Oo][Rr][Ii][Dd][Aa]|
-                [Gg][Ee][Oo][Rr][Gg][Ii][Aa]|
-                [Hh][Aa][Ww][Aa][Ii][Ii]|
-                [Ii][Dd][Aa][Hh][Oo]|
-                [Ii][Ll][Ll][Ii][Nn][Oo][Ii][Ss]|
-                [Ii][Nn][Dd][Ii][Aa][Nn][Aa]|
-                [Ii][Oo][Ww][Aa]|
-                [Kk][Aa][Nn][Ss][Aa][Ss]|
-                [Kk][Ee][Nn][Tt][Uu][Cc][Kk][Yy]|
-                [Ll][Oo][Uu][Ii][Ss][Ii][Aa][Nn][Aa]|
-                [Mm][Aa][Ii][Nn][Ee]|
-                [Mm][Aa][Rr][Yy][Ll][Aa][Nn][Dd]|
-                [Mm][Aa][Ss][Ss][Aa][Cc][Hh][Uu][Ss][Ee][Tt][Tt][Ss]|
-                [Mm][Ii][Cc][Hh][Ii][Gg][Aa][Nn]|
-                [Mm][Ii][Nn][Nn][Ee][Ss][Oo][Tt][Aa]|
-                [Mm][Ii][Ss][Ss][Ii][Ss][Ss][Ii][Pp][Pp][Ii]|
-                [Mm][Ii][Ss][Ss][Oo][Uu][Rr][Ii]|
-                [Mm][Oo][Nn][Tt][Aa][Nn][Aa]|
-                [Nn][Ee][Bb][Rr][Aa][Ss][Kk][Aa]|
-                [Nn][Ee][Vv][Aa][Dd][Aa]|
-                [Nn][Ee][Ww]\ [Hh][Aa][Mm][Pp][Ss][Hh][Ii][Rr][Ee]|
-                [Nn][Ee][Ww]\ [Jj][Ee][Rr][Ss][Ee][Yy]|
-                [Nn][Ee][Ww]\ [Mm][Ee][Xx][Ii][Cc][Oo]|
-                [Nn][Ee][Ww]\ [Yy][Oo][Rr][Kk]|
-                [Nn][Oo][Rr][Tt][Hh]\ [Cc][Aa][Rr][Oo][Ll][Ii][Nn][Aa]|
-                [Nn][Oo][Rr][Tt][Hh]\ [Dd][Aa][Kk][Oo][Tt][Aa]|
-                [Oo][Hh][Ii][Oo]|
-                [Oo][Kk][Ll][Aa][Hh][Oo][Mm][Aa]|
-                [Oo][Rr][Ee][Gg][Oo][Nn]|
-                [Pp][Ee][Nn][Nn][Ss][Yy][Ll][Vv][Aa][Nn][Ii][Aa]|
-                [Rr][Hh][Oo][Dd][Ee]\ [Ii][Ss][Ll][Aa][Nn][Dd]|
-                [Ss][Oo][Uu][Tt][Hh]\ [Cc][Aa][Rr][Oo][Ll][Ii][Nn][Aa]|
-                [Ss][Oo][Uu][Tt][Hh]\ [Dd][Aa][Kk][Oo][Tt][Aa]|
-                [Tt][Ee][Nn][Nn][Ee][Ss][Ss][Ee][Ee]|
-                [Tt][Ee][Xx][Aa][Ss]|
-                [Uu][Tt][Aa][Hh]|
-                [Vv][Ee][Rr][Mm][Oo][Nn][Tt]|
-                [Vv][Ii][Rr][Gg][Ii][Nn][Ii][Aa]|
-                [Ww][Aa][Ss][Hh][Ii][Nn][Gg][Tt][Oo][Nn]|
-                [Ww][Ee][Ss][Tt]\ [Vv][Ii][Rr][Gg][Ii][Nn][Ii][Aa]|
-                [Ww][Ii][Ss][Cc][Oo][Nn][Ss][Ii][Nn]|
-                [Ww][Yy][Oo][Mm][Ii][Nn][Gg]|
-                # unincorporated & commonwealth territories
-                [Aa][Mm][Ee][Rr][Ii][Cc][Aa][Nn]\ [Ss][Aa][Mm][Oo][Aa]
-                |[Gg][Uu][Aa][Mm]|
-                [Nn][Oo][Rr][Tt][Hh][Ee][Rr][Nn]\ [Mm][Aa][Rr][Ii][Aa][Nn][Aa]\ 
-                [Ii][Ss][Ll][Aa][Nn][Dd][Ss]|
-                [Pp][Uu][Ee][Rr][Tt][Oo]\ [Rr][Ii][Cc][Oo]|
-                [Vv][Ii][Rr][Gg][Ii][Nn]\ [Ii][Ss][Ll][Aa][Nn][Dd][Ss]
-            )
-        )
-        """
 
 # TODO: doesn't catch cities containing French characters
 city = r"""
