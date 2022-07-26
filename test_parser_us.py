@@ -110,6 +110,7 @@ def test_thousand(input, expected):
     ("256", True),
     ("1256", True),
     ("32457", True),
+    ("N32W457", True),
     # negative assertions (words)
     ("ONE THousszz22and FIFTY and four onde", False),
     ("ONE one oNe and onE Three", False),
@@ -204,34 +205,34 @@ def test_special_streets(input, expected):
 
 @pytest.mark.parametrize("input,expected", [
     # positive assertions
-    ("floor 3 ", True),
-    ("floor 11 ", True),
-    ("floor 15 ", True),
-    ("1st floor ", True),
-    ("2nd floor ", True),
-    ("15th floor ", True),
-    ("16th. floor ", True),
+    ("floor 3", True),
+    ("floor 11", True),
+    ("floor 15", True),
+    ("1st floor", True),
+    ("2nd floor", True),
+    ("15th floor", True),
+    ("16th. floor", True),
     # negative assertions
-    ("16th.floor ", False),
-    ("1stfloor ", False),
+    ("16th.floor", False),
+    ("1stfloor", False),
 
 ])
 def test_floor(input, expected):
     ''' tests string match for a floor '''
-    execute_matching_test(input, expected, data_us.floor)
+    execute_matching_test(input, expected, data_us.occupancy)
 
 
 @pytest.mark.parametrize("input,expected", [
     # positive assertions
-    ("bldg m ", True),
-    ("Building F ", True),
-    ("bldg 2 ", True),
-    ("building 3 ", True),
-    ("building 100 ", True),
-    ("building 1000 ", True),
-    ("Building ", True),
-    ("building one ", True),
-    ("Building three ", True),
+    ("bldg m", True),
+    ("Building F", True),
+    ("bldg 2", True),
+    ("building 3", True),
+    ("building 100", True),
+    ("building 1000", True),
+    ("Building", False),
+    ("building one ", False),
+    ("Building three ", False),
     # negative assertions
     ("bldg", False),
     ("bldgm", False),
@@ -241,34 +242,33 @@ def test_floor(input, expected):
 ])
 def test_building(input, expected):
     ''' tests string match for a building '''
-    execute_matching_test(input, expected, data_us.building)
+    execute_matching_test(input, expected, data_us.occupancy)
 
 
 @pytest.mark.parametrize("input,expected", [
     # positive assertions
-    ("suite 900 ", True),
-    ("Suite #2 ", True),
-    ("suite #218 ", True),
-    ("suite J7 ", True),
-    ("suite 102A ", True),
-    ("suite a&b ", True),
-    ("Suite J#200 ", True),
-    ("suite 710-327 ", True),
-    ("Suite A ", True),
-    ("ste A ", True),
-    ("Ste 101 ", True),
-    ("ste 502b ", True),
-    ("ste 14-15 ", True),
-    ("ste E ", True),
-    ("ste 9E ", True),
-    ("Suite 1800 ", True),
-    ("Apt 1B ", True),
-    ("Rm. 52 ", True),
-    ("#2b ", True),
-    # negative assertions
-    ("suite900 ", False),
-    ("Suite#2", False),
-    ("suite218 ", False),
+    ("suite 900", True),
+    ("Suite #2", True),
+    ("suite #218", True),
+    ("suite J7", True),
+    ("suite 102A", True),
+    ("suite a&b", True),
+    ("Suite J#200", True),
+    ("suite 710-327", True),
+    ("Suite A", True),
+    ("ste A", True),
+    ("Ste 101", True),
+    ("ste 502b", True),
+    ("ste 14-15", True),
+    ("ste E", True),
+    ("ste 9E", True),
+    ("Suite 1800", True),
+    ("Apt 1B", True),
+    ("Rm. 52", True),
+    ("#2b", True),
+    ("suite900", True),
+    ("Suite#2", True),
+    ("suite218", True),
 ])
 def test_occupancy(input, expected):
     ''' tests string match for a place id '''
@@ -497,6 +497,7 @@ def test_military_address(input, expected):
     ("75062", True),
     ("15032", True),
     ("95130-6482", True),
+    ("951306482", True),
     # negative assertions
     ("1", False),
     ("23", False),
@@ -518,6 +519,7 @@ def test_postal_code(input, expected):
     ("NJ", True),
     ("nJ", True),
     ("mi", True),
+    ("FM", True),
     ("DC", True),
     ("PuErTO RIco", True),
     ("oregon", True),

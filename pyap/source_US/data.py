@@ -351,93 +351,74 @@ special_streets = r"""
         )
 """
 
-floor = r"""
-            (?P<floor>
-                (?:
-                \d+[A-Za-z]{0,2}\.?\ [Ff][Ll][Oo][Oo][Rr]\ ?
-                )
-                |
-                (?:
-                    [Ff][Ll][Oo][Oo][Rr]\ \d+[A-Za-z]{0,2}\ ?
-                )
-            )
-        """
+secondary_unit_designators_require_range = r"""
+    (?:
+        (?:
+            #Word, Offical Abbreviation, Additional Abbreviations
+            [Aa][Pp][Aa][Rr][Tt][Mm][Ee][Nn][Tt]|[Aa][Pp][Tt]\.?|[Aa][Pp][Pp][Tt]\.?|
+            [Bb][Uu][Ii][Ll][Dd][Ii][Nn][Gg]|[Bb][Ll][Dd][Gg]\.?|
+            [Dd][Ee][Pp][Aa][Rr][Tt][Mm][Ee][Nn][Tt]|[Dd][Ee][Pp][Tt]\.?|
+            [Ff][Ll][Oo][Oo][Rr]|[Ff][Ll]\.?|
+            [Hh][Aa][Nn][Gg][Ee][Rr]|[Hh][Nn][Gg][Rr]\.?|
+            [Kk][Ee][Yy]|
+            [Ll][Oo][Tt]|
+            [Pp][Ii][Ee][Rr]|
+            [Rr][Oo][Oo][Mm]|[Rr][Mm]\.?|
+            [Ss][Ll][Ii][Pp]|
+            [Ss][Pp][Aa][Cc][Ee]|[Ss][Pp][Cc]\.?|
+            [Ss][Tt][Oo][Pp]|
+            [Ss][Uu][Ii][Tt][Ee]|[Ss][Tt][Ee]\.?|
+            [Tt][Rr][Aa][Ii][Ll][Ee][Rr]|[Tt][Rr][Ll][Rr]\.?|
+            [Uu][Nn][Ii][Tt]|
+            \#|
 
-building = r"""
-            (?P<building_id>
-                (?:
-                    (?:[Bb][Uu][Ii][Ll][Dd][Ii][Nn][Gg])
-                    |
-                    (?:[Bb][Ll][Dd][Gg])
-                )
-                \ 
-                (?:
-                    (?:
-                        {thousand}
-                        |
-                        {hundred}
-                        |
-                        {zero_to_nine}
-                        |
-                        {ten_to_ninety}
-                    )
-                    (?:
-                        [Aa][Nn][Dd]\ 
-                        |
-                        {thousand}
-                        |
-                        {hundred}
-                        |
-                        {zero_to_nine}
-                        |
-                        {ten_to_ninety}
-                    ){{0,4}}
-                    |
-                    \d{{0,4}}[A-Za-z]?
-                )
-                \ ?
-            )
-            """.format(thousand=thousand,
-                       hundred=hundred,
-                       zero_to_nine=zero_to_nine,
-                       ten_to_ninety=twenty_to_ninety,
-                       )
+            #Unoffical Ranged Designations
+            [Ll][Ee][Vv][Ee][Ll]
+        )
+        (?:
+            [\ -#\n]{0,2}
+            (?:[Nn][Oo][\ -#\n]{0,2})?
+            [A-Za-z#\-&\d]{1,7}
+        )
+    )
+"""
+secondary_unit_designators_optional_range = r"""
+    (?:
+        #Word, Offical Abbreviation, Additional Abbreviations
+        [Bb][Aa][Ss][Ee][Mm][Ee][Nn][Tt]|[Bb][Ss][Mm][Tt]|
+        [Ff][Rr][Oo][Nn][Tt]|[Ff][Rr][Nn][Tt]|
+        [Ll][Oo][Bb][Bb][Yy]|[Ll][Bb][Bb][Yy]|
+        [Ll][Oo][Ww][Ee][Rr]|[Ll][Oo][Ww][Rr]|
+        [Oo][Ff][Ff][Ii][Cc][Ee]|[Oo][Ff][Cc]|
+        [Pp][Ee][Nn][Tt][Hh][Oo][Uu][Ss][Ee]|[Pp][Hh]|
+        [Rr][Ee][Aa][Rr]|
+        [Ss][Ii][Dd][Ee]|
+        [Uu][Pp][Pp][Ee][Rr]|[Uu][Pp][Pp][Rr]|
+
+        #Unoffical Designations
+        [Tt][Ee][Rr][Rr][Aa][Cc][Ee]
+    )
+"""
+
+secondard_unit_designators_leading_range = r"""
+    (?:\d{1,2}
+        (?:[Ss][Tt]|[Nn][Dd]|[Rr][Dd]|[Tt][Hh])?
+    )\ 
+    (?:
+        [Ff][Ll][Oo][Oo][Rr]|[Ff][Ll]\.?
+    )
+"""
 
 occupancy = r"""
             (?:
                 (?:
-                    (?:
-                        (?:
-                            # Suite
-                            [Ss][Uu][Ii][Tt][Ee]\ |[Ss][Tt][Ee]\.?\ 
-                            |
-                            # Apartment
-                            [Aa][Pp][Tt]\.?\ |[Aa][Pp][Aa][Rr][Tt][Mm][Ee][Nn][Tt]\ |[Aa][Pp][Pp][Tt]\.?\
-                            |
-                            # Room
-                            [Rr][Oo][Oo][Mm]\ |[Rr][Mm]\.?\ 
-                            |
-                            #Units
-                            [Uu][Nn][Ii][Tt]\ 
-                            |
-                            #Terrace
-                            [Tt][Ee][Rr]{2}[Aa][Cc][Ee]\ 
-                        )
-                        (?:
-                            [A-Za-z\#\&\-\d]{1,7}
-                        )?
-                    )
-                    |
-                    (?:
-                        \#?[0-9]{,3}[A-Za-z]{1}
-                    )
-                    |
-                    (?:
-                        \#?\b[0-9]{1,3}[A-Za-z]?\b
-                    )
-                )\ ?
+                    {secondard_unit_designators_leading_range}|{secondary_unit_designators_require_range}|{secondary_unit_designators_optional_range}
+                )
             )
-            """
+            """.format(
+    secondard_unit_designators_leading_range=secondard_unit_designators_leading_range,
+    secondary_unit_designators_require_range=secondary_unit_designators_require_range,
+    secondary_unit_designators_optional_range=secondary_unit_designators_optional_range)
 
 po_box = r"""
             (?:
@@ -449,14 +430,6 @@ po_box = r"""
                 )
             )
         """
-
-dept_no = r"""
-    (?:
-        (?:[Dd][Ee][Pp][Tt][\.\,\ #]{1,3}\d{1,3})
-        |
-        (?:[Dd][Ee][Pp][Aa][Rr][Tt][Mm][Ee][Nn][Tt][\ \n][Nn][Oo][\.\ ]{1,2}\d{1,3})
-    )
-"""
 
 dorm = r"""
     (?P<dorm>
@@ -475,9 +448,6 @@ street_type_b = re.sub('<([a-z_]+)>', r'<\1_b>', street_type)
 street_name_b = re.sub('<([a-z_]+)>', r'<\1_b>', street_name)
 street_name_c = re.sub('<([a-z_]+)>', r'<\1_c>', street_name)
 post_direction_b = re.sub('<([a-z_]+)>', r'<\1_b>', post_direction)
-floor_b = re.sub('<([a-z_]+)>', r'<\1_b>', floor)
-building_b = re.sub('<([a-z_]+)>', r'<\1_b>', building)
-occupancy_b = re.sub('<([a-z_]+)>', r'<\1_b>', occupancy)
 dorm_b = re.sub('<([a-z_]+)>', r'<\1_b>', dorm)
 
 full_street_no_street_type = r"""
@@ -487,9 +457,9 @@ full_street_no_street_type = r"""
             {street_number_b}{div}
             {street_name_b}{div}?
             (?:{post_direction_b}{div})?
-            (?:{floor_b}{div})?
-            (?:{building_b}{div})?
-            (?:{occupancy_b}{div})?
+            (?P<occupancy_b>
+                (?:{occupancy}{div}){{0,3}}
+            )
             (?:{po_box}{div})?
         )
     )
@@ -497,9 +467,7 @@ full_street_no_street_type = r"""
            street_number_b=street_number_b,
            street_name_b=street_name_b,
            post_direction_b=post_direction_b,
-           floor_b=floor_b,
-           building_b=building_b,
-           occupancy_b=occupancy_b,
+           occupancy=occupancy,
            po_box=po_box,
            div=restrictive_div
            )
@@ -509,7 +477,6 @@ full_street = r"""
         (?:
             {po_box}{div}?
             (?:{occupancy}{div})?
-            (?:{dept_no}{div})?
         )
         |
         (?:
@@ -524,20 +491,16 @@ full_street = r"""
                 )
             )
             (?:{post_direction}{div})?
-            (?:{floor}{div})?
-            (?:{building}{div})?
-            (?:{occupancy}{div})?
+            (?P<occupancy>
+                (?:{occupancy}{div}){{0,3}}
+            )
             (?:{po_box}{div})?
-            (?:{dept_no}{div})?
         )
     )""".format(dorm=dorm,
                 street_number=street_number,
                 street_name=street_name,
                 street_type=street_type,
                 post_direction=post_direction,
-                floor=floor,
-                building=building,
-                dept_no=dept_no,
                 occupancy=occupancy,
                 po_box=po_box,
                 div=restrictive_div,
@@ -571,8 +534,9 @@ region = r"""
 
                 # unincorporated & commonwealth territories
                 [Aa]\.?[Ss]|
+                [Ff]\.?[Mm]|
                 [Gg]\.?[Uu]|
-                [Mm]\.?[Pp]|
+                [Mm]\.?(?:[Hh]|[Pp])|
                 [Pp]\.?[Rr]|
                 [Vv]\.?[Ii]
             )\b
@@ -653,7 +617,7 @@ city = r"""
 
 postal_code = r"""
             (?P<postal_code>
-                (?:\d{5}(?:\-\d{4})?)
+                (?:\d{5}(?:\-?\d{4})?)
             )
             """
 
@@ -666,27 +630,19 @@ country = r"""
 
 military_postal_type = r"""
     (?:
-        (?:
-            UNIT|PSC|CMR
-        )\ \d{1,6}
+        (?:UNIT|PSC|CMR)\ \d{1,6}
     )
 """
 military_box = r"""
-    (?:
-        BOX\ \d{3,4}
-    )
+    (?:BOX\ \d{3,4})
 """
 
 military_branch = r"""
-    (?:
-        APO|FPO|DPO
-    )
+    (?:APO|FPO|DPO)
 """
 
 military_state_codes = r"""
-    (?:
-        AA|AE|AP
-    )
+    (?:AA|AE|AP)
 """
 
 postal_code_b = re.sub('<([a-z_]+)>', r'<\1_b>', postal_code)
