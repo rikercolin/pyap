@@ -24,8 +24,8 @@ instead of '(one)(?i)' to match 'One' or 'oNe' because
 Python Regexps don't seem to support turning On/Off
 case modes for subcapturing groups.
 '''
-common_div = '[\ |\,|\-|\||٠∙•••●▪\\\/;]{0,4}'
-restrictive_div = '[\.\ \,\n]{1,4}'
+common_div = '(?:[\ |\,|\-|\||٠∙•••●▪\\\/;]{0,4})'
+restrictive_div = '(?:[\.\ \,()\n\r]{1,5})'
 
 zero_to_nine = r"""(?:
     [Zz][Ee][Rr][Oo]\ ?|[Oo][Nn][Ee]\ ?|[Tt][Ww][Oo]\ ?|
@@ -178,32 +178,47 @@ In example below:
 '''
 street_name = r"""
     (?P<street_name>
-        (?:[a-zA-Z0-9][a-zA-Z0-9\ \.\-\n]{0,30})
+        (?:\"?[a-zA-Z0-9][a-zA-Z0-9\ \.\-\n&']{0,30}\"?)
     )
               """
 
 post_direction = r"""
                     (?P<post_direction>
                         (?:
+                            #English
                             [Nn][Oo][Rr][Tt][Hh]\ |
-                            [Ss][Oo][Uu][Tt][Hh]\ 
+                            [Ss][Oo][Uu][Tt][Hh]\ |
+
+                            #Spanish
+                            [Nn][Oo][Rr][Tt][Ee]\ |
+                            [Ss][Uu][Rr]\ 
                         )
                         (?:
+                            #English
                             \s?[Ee][Aa][Ss][Tt]\ |
-                            \s?[Ww][Ee][Ss][Tt]\ 
+                            \s?[Ww][Ee][Ss][Tt]\ |
+
+                            #Spanish
+                            \s?[Oo][Ee][Ss][Tt][Ee]\ |
+                            \s?[Ee][Ss][Tt][Ee]\ 
                         )?
                         |
                         (?:
+                            #English
                             [Ee][Aa][Ss][Tt]\ |
-                            [Ww][Ee][Ss][Tt]\ 
+                            [Ww][Ee][Ss][Tt]\ |
+
+                            #Spanish
+                            [Ee][Ss][Tt][Ee]\ |
+                            [Oo][Ee][Ss][Tt][Ee]\ |
                         )
                         |
                         (?:
-                            [NS]\.?[WE](?:[\.\ ]|\b)
+                            [NS]\.?[WEO](?:[\.\ ]|\b)
                         )
                         |
                         (?:
-                            [NSEW](?:[\.\ ]|\b)
+                            [NSEWO](?:[\.\ ]|\b)
                         )
                     )
                 """
@@ -306,6 +321,27 @@ region = r"""
             [Pp][Uu][Ee][Rr][Tt][Oo]\ [Rr][Ii][Cc][Oo]|
             [Vv][Ii][Rr][Gg][Ii][Nn]\ [Ii][Ss][Ll][Aa][Nn][Dd][Ss]
         )
+    )
+"""
+
+romance_language_street_types = r"""
+    (?:
+        #Spanish
+        [Aa][Vv][Ee][Nn][Ii][Dd][Aa]|[Aa][Vv][Ee]\.?|
+        [Cc][Aa][Ll][Ll][Ee]|[Cc][Ll][Ll]\.?|
+        [Cc][Aa][Mm][Ii][Nn][Tt][Oo]|[Cc][Mm][Tt]\.?|
+        [Cc][Aa][Mm][Ii][Nn][Oo]|[Cc][Aa][Mm]\.?|
+        [Cc][Ee][Rr][Rr][Aa][Dd][Aa]|[Cc][Ee][Rr]\.?|
+        [Cc][Ii][Rr][Cc][Uu][Ll][Oo]|[Cc][Ii][Rr]\.?|
+        [Ee][Nn][Tt][Rr][Aa][Dd][Aa]|[Ee][Nn][Tt]\.?|
+        [Pp][Aa][Ss][Ee][Oo]|[Pp][Ss][Oo]\.?|
+        [Pp][Ll][Aa][Cc][Ii][Tt][Aa]|[Pp][Ll][Aa]\.?|
+        [Rr][Aa][Nn][Cc][Hh][Oo]|[Rr][Cc][Hh]\.?|
+        [Vv][Ee][Rr][Ee][Dd][Aa]|[Vv][Ee][Rr]\.?|
+        [Vv][Ii][Ss][Tt][Aa]|[Vv][Ii][Ss]\.?|
+
+        #French
+        [Rr][Uu][Ee]
     )
 """
 
@@ -424,6 +460,7 @@ def street_type_list_to_regex(street_type_list):
         div=r'[\.\ ,]{0,2}',
     )
 
+
 street_fractions = r"""
     (?:[123]\/[2-9](?:[Rr][Dd]|[Tt][Hh])?)
 """
@@ -432,7 +469,7 @@ street_fractions = r"""
 street_type = r"""
             (?:
                 (?P<street_type>
-                    {street_types}
+                    {street_types}|{romance_language_street_types}{div}
                 )
                 (?P<route_id>
                     [\(\ \,]{route_symbols}
@@ -442,6 +479,8 @@ street_type = r"""
 """.format(
     route_symbols='{0,3}',
     street_types=street_type_list_to_regex(street_type_list),
+    romance_language_street_types=romance_language_street_types,
+    div=restrictive_div,
 )
 
 highway_prefix = r"""
@@ -527,6 +566,7 @@ secondary_unit_designators_require_range = r"""
         )
     )
 """
+
 secondary_unit_designators_optional_range = r"""
     (?:
         #Word, Offical Abbreviation, Additional Abbreviations
@@ -546,13 +586,13 @@ secondary_unit_designators_optional_range = r"""
 """
 
 secondard_unit_designators_leading_range = r"""
-    (?:\d{1,2}
+    (?:\d{{1,2}}
         (?:[Ss][Tt]|[Nn][Dd]|[Rr][Dd]|[Tt][Hh])?
-    )\ 
+    ){div}
     (?:
         [Ff][Ll][Oo][Oo][Rr]|[Ff][Ll]\.?
     )
-"""
+""".format(div=restrictive_div)
 
 occupancy = r"""
             (?:
@@ -569,12 +609,12 @@ po_box = r"""
             (?:
                 \b(?:
                     # English - PO Box 123
-                    (?:[Pp][\ \.\n]{0,3}[Oo][\ \.\n]{1,3}[Bb][Oo][Xx][\ \n]{1,3}\d+)
+                    (?:[Pp](?:{div})?[Oo]{div}[Bb][Oo][Xx]{div}[\w\d\-]{{1,9}})
                     |
-                    (?:[Bb][Oo][Xx][\ \n]{1,3}\d+)
+                    (?:(?:[Ss][Tt][Aa][Rr]{div}[Rr][Oo][Uu][Tt][Ee]|[Hh][Cc]|[Rr][Rr])(?:{div})?\d{{1,3}}\ )?(?:[Bb][Oo][Xx]{div}[\w\d\-]{{1,9}})
                 )
             )
-        """
+        """.format(div=restrictive_div)
 
 dorm = r"""
     (?P<dorm>
@@ -592,14 +632,17 @@ street_number_b = re.sub('<([a-z_]+)>', r'<\1_b>', street_number)
 street_type_b = re.sub('<([a-z_]+)>', r'<\1_b>', street_type)
 street_name_b = re.sub('<([a-z_]+)>', r'<\1_b>', street_name)
 street_name_c = re.sub('<([a-z_]+)>', r'<\1_c>', street_name)
+street_name_d = re.sub('<([a-z_]+)>', r'<\1_d>', street_name)
 post_direction_b = re.sub('<([a-z_]+)>', r'<\1_b>', post_direction)
 dorm_b = re.sub('<([a-z_]+)>', r'<\1_b>', dorm)
+
 
 full_street_no_street_type = r"""
     (?P<full_street_b>
         (?:
             (?:{dorm_b}{div})?
             {street_number_b}{div}
+            (?:{street_fractions}{div})?
             {street_name_b}{div}?
             (?:{post_direction_b}{div})?
             (?P<occupancy_b>
@@ -613,6 +656,7 @@ full_street_no_street_type = r"""
            street_name_b=street_name_b,
            post_direction_b=post_direction_b,
            occupancy=occupancy,
+           street_fractions=street_fractions,
            po_box=po_box,
            div=restrictive_div
            )
@@ -620,19 +664,30 @@ full_street_no_street_type = r"""
 full_street = r"""
     (?P<full_street>
         (?:
+            [Gg][Ee][Nn][Ee][Rr][Aa][Ll]\ [Dd][Ee][Ll][Ii][Vv][Ee][Rr][Yy]
+        )
+        |
+        (?:
             {po_box}{div}?
             (?:{occupancy}{div})?
         )
         |
         (?:
+            (?:{po_box}{div})?
             (?:{dorm}{div})?
             {street_number}{div}
+            (?:{street_fractions}{div})?
             (?:
                 (?:{highways}{div}?)
                 |
                 (?:
                     {street_name}{div}
                     {street_type}(?:{div})?
+                )
+                |
+                (?:
+                    {romance_language_street_types}{div}
+                    {street_name_d}(?:{div})?
                 )
             )
             (?:{post_direction}{div})?
@@ -644,18 +699,20 @@ full_street = r"""
     )""".format(dorm=dorm,
                 street_number=street_number,
                 street_name=street_name,
+                street_name_d=street_name_d,
                 street_type=street_type,
                 post_direction=post_direction,
                 occupancy=occupancy,
                 po_box=po_box,
                 div=restrictive_div,
                 highways=highways,
+                romance_language_street_types=romance_language_street_types,
+                street_fractions=street_fractions,
                 )
 
-# TODO: doesn't catch cities containing French characters
 city = r"""
         (?P<city>
-            \b[A-Za-z]{1}[a-zA-Z\ \-\'\.]{2,20}
+            \b[A-Za-z]{1}[a-zA-Z\ \-\'\.]{1,20}
         )
         """
 
@@ -668,25 +725,25 @@ postal_code = r"""
 country = r"""
             (?:
                 [Uu]\.?[Ss]\.?[Aa]\.?|
-                [Uu][Nn][Ii][Tt][Ee][Dd]\ [Ss][Tt][Aa][Tt][Ee][Ss](?:\ [Oo][Ff]\ [Aa][Mm][Ee][Rr][Ii][Cc][Aa])?
+                [Uu][Nn][Ii][Tt][Ee][Dd]{div}[Ss][Tt][Aa][Tt][Ee][Ss](?:{div}[Oo][Ff]{div}[Aa][Mm][Ee][Rr][Ii][Cc][Aa])?
             )
-            """
+            """.format(div=restrictive_div)
 
 military_postal_type = r"""
     (?:
-        (?:UNIT|PSC|CMR)\ \d{1,6}
+        (?:[Uu][Nn][Ii][Tt]|[Pp][Ss][Cc]|[Cc][Mm][Rr]){div}\d{{1,6}}
     )
-"""
+""".format(div=restrictive_div)
 military_box = r"""
-    (?:BOX\ \d{3,4})
-"""
+    (?:[Bb][Oo][Xx]{div}\d{{3,4}})
+""".format(div=restrictive_div)
 
 military_branch = r"""
-    (?:APO|FPO|DPO)
+    (?:[Aa][Pp][Oo]|[Ff][Pp][Oo]|[Dd][Pp][Oo])
 """
 
 military_state_codes = r"""
-    (?:AA|AE|AP)
+    (?:[Aa][Aa]|[Aa][Ee]|[Aa][Pp])
 """
 
 postal_code_b = re.sub('<([a-z_]+)>', r'<\1_b>', postal_code)
@@ -699,7 +756,7 @@ region_c = re.sub('<([a-z_]+)>', r'<\1_c>', region)
 military_full_address = r"""
     (?P<military_address>
         {military_postal_type}{div}
-        {military_box}{div}
+        (?:{military_box}{div})?
         {military_branch}{div}
         {military_state_codes}
     )
@@ -714,17 +771,22 @@ military_full_address = r"""
 full_address = r"""
                 (?P<full_address>
                     (?:
+                        {military_full_address}{div}
+                        {postal_code_d}
+                    )
+                    |
+                    (?:
                         (?:{full_street}|{full_street_no_street_type}) {div}?
                         {city} {div}?
 
                         (?:
-                            (?:{postal_code}|{region})(?:{div}{country})?(?(postal_code)(?(full_street)(?:{div}{region_b})?|(?:{div}{region_c}))|(?(full_street)(?:{div}{postal_code_b})?|{div}{postal_code_c}))(?:{div}{country})?
+                            (?:{postal_code}|{region})
+                            (?:{div}{country})?
+                            (?(postal_code)
+                                (?(full_street)(?:{div}{region_b})?|(?:{div}{region_c}))|
+                                (?(full_street)(?:{div}{postal_code_b})?|{div}{postal_code_c}))
+                            (?:{div}{country})?
                         )
-                    )
-                    |
-                    (?:
-                        {military_full_address}{div}
-                        {postal_code_d}
                     )
                 )
                 """.format(

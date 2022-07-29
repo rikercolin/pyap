@@ -383,6 +383,11 @@ def test_po_box_positive(input, expected):
     ("8967 Market St.", True),
     ("3724 Oxford Blvd.", True),
     ("901 Rainier Ave S ", True),
+    ("100 1/2 Main Ave E ", True),
+    ("200 1/4th Rue de Poste E ", True),
+    ("10-200 1/3rd Vista Serra SW ", True),
+    ("1790 Yardley Paseo Rd #205,", True),
+    ("10 CALLE VERDE OESTE", True),
 ])
 def test_full_street_positive(input, expected):
     ''' tests exact string match for a full street '''
@@ -465,6 +470,9 @@ def test_full_street_positive(input, expected):
     ("UNIT 8400 BOX 0000 DPO AE 09498-0048", True),
     ("PSC 3 BOX 400 DPO AE 09021", True),
     ("1090 1100 E, Salt Lake City, UT 84105", True),
+    ("RR 4 Box 34, Place City, MI", True),
+    ("HC 40 Box 34343, Smith Town, FM 84105", True),
+    ("General Delivery, Throgsneck, NY 10465", True),
     # negative assertions
     ("85 STEEL REGULAR SHAFT - NE", False),
     ("3 STRUCTURE WITH PE", False),
@@ -512,6 +520,7 @@ def test_military_address(input, expected):
     ("UNIT 100100 BOX 4120 FPO AP", True),
     ("UNIT 2340 BOX 132 APO AE", True),
     ("UNIT 8400 BOX 0000 DPO AE", True),
+    ("PSC 561, Box 1876, FPO AP", True)
 ])
 def test_military_address(input, expected):
     ''' test exact string match for military full address '''
