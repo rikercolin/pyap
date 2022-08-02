@@ -51,13 +51,6 @@ Pyap is an alternative to all these methods. It is really fast because
 it is based on using regular expressions and it allows to find addresses
 in text in real time with low error rates.
 
-
-Future work
------------
-- Add rules for parsing FR addresses
-- ...
-
-
 Typical workflow
 ----------------
 Pyap should be used as a first thing when you need to detect an address
@@ -88,4 +81,27 @@ and a state name abbreviation "IN" (Indiana).
 
 The good news is that the above mentioned errors are **quite rare**.
 
+Intresting Further Directions
+-----------
+Atomics implemented via the *regex* library or Via C# 
+    https://github.com/mrabarnett/mrab-regex
+
+DFA Implementation in Python
+    https://blog.devgenius.io/finite-automata-implement-a-dfa-in-python-64dc3d7005d9
+
+TDFA/DFA re2c 
+    https://re2c.org/
+    https://re2c.org/2022_borsotti_trofimovich_a_closer_look_at_tdfa.pdf
+
+DFA Regular Expression Library 
+    https://github.com/katef/libfsm
+
+DFA Minimiuzation 
+    https://en.wikipedia.org/wiki/DFA_minimization
+
+Pushdown Automatons
+    https://en.wikipedia.org/wiki/Pushdown_automaton
+
+Limiting Backtracing
+    https://swtch.com/~rsc/regexp/regexp1.html
 
