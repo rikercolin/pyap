@@ -186,42 +186,42 @@ post_direction = r"""
                     (?P<post_direction>
                         (?:
                             #English
-                            [Nn][Oo][Rr][Tt][Hh]\ |
-                            [Ss][Oo][Uu][Tt][Hh]\ |
+                            [Nn][Oo][Rr][Tt][Hh]|
+                            [Ss][Oo][Uu][Tt][Hh]|
 
                             #Spanish
-                            [Nn][Oo][Rr][Tt][Ee]\ |
-                            [Ss][Uu][Rr]\ 
+                            [Nn][Oo][Rr][Tt][Ee]|
+                            [Ss][Uu][Rr]
                         )
                         (?:
                             #English
-                            \s?[Ee][Aa][Ss][Tt]\ |
-                            \s?[Ww][Ee][Ss][Tt]\ |
+                            {div}?[Ee][Aa][Ss][Tt]|
+                            {div}?[Ww][Ee][Ss][Tt]|
 
                             #Spanish
-                            \s?[Oo][Ee][Ss][Tt][Ee]\ |
-                            \s?[Ee][Ss][Tt][Ee]\ 
+                            {div}?[Oo][Ee][Ss][Tt][Ee]|
+                            {div}?[Ee][Ss][Tt][Ee]
                         )?
                         |
                         (?:
                             #English
-                            [Ee][Aa][Ss][Tt]\ |
-                            [Ww][Ee][Ss][Tt]\ |
+                            [Ee][Aa][Ss][Tt]|
+                            [Ww][Ee][Ss][Tt]|
 
                             #Spanish
-                            [Ee][Ss][Tt][Ee]\ |
-                            [Oo][Ee][Ss][Tt][Ee]\ |
+                            [Ee][Ss][Tt][Ee]|
+                            [Oo][Ee][Ss][Tt][Ee]|
                         )
                         |
                         (?:
-                            [NS]\.?[WEO](?:[\.\ ]|\b)
+                            [NS]\.?[WEO]\b
                         )
                         |
                         (?:
-                            [NSEWO](?:[\.\ ]|\b)
+                            [NSEWO]\b
                         )
                     )
-                """
+                """.format(div=restrictive_div)
 
 # region is actually a "state"
 region = r"""
@@ -442,9 +442,6 @@ street_type_list = [
     'Wls', 'Wy', 'Xing', 'Xrd', 'Xrds',
 ]
 
-# removed_street_type_list = ['Is']
-
-
 def street_type_list_to_regex(street_type_list):
     """Converts a list of street types into a regex"""
     street_types = '|'.join(set(street_type_list)).lower()
@@ -516,6 +513,7 @@ highway_types = r"""
     )
 """
 region_d = re.sub('<([a-z_]+)>', r'<\1_d>', region)
+
 highways = r"""
     (?:
         (?P<highway_prefix>
